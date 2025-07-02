@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FaExclamationCircle, FaBoxOpen, FaFileAlt, FaCalculator, FaDollarSign, FaRuler, FaMoneyBillWave, FaImage, FaPaperPlane, FaPlus, FaMinus } from 'react-icons/fa';
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
-const sps = ['Producto', 'Servicio'];
+const sps = ['Producto', 'Servicio','Áctivo'];
 const umedidas = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego'];
 const monedas = ['Dolares', 'Soles', 'Euros'];
 
@@ -44,7 +44,7 @@ function FormularioIndividual({ usuarioId }: { usuarioId: number }) {
     
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/solicitudes', {
+      const res = await fetch('http://192.168.0.113:8080/solicitudes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

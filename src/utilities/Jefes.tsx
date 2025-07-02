@@ -45,7 +45,7 @@ export default function ConfirmationTable() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:8080/solicitudes/jefe?page=${page - 1}&size=${PAGE_SIZE}`, {
+        const res = await fetch(`http://192.168.0.113:8080/solicitudes/jefe?page=${page - 1}&size=${PAGE_SIZE}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -103,7 +103,7 @@ export default function ConfirmationTable() {
       await Promise.all(ids.map(async (id) => {
         if (!nuevos[id]) {
           try {
-            const res = await fetch(`http://localhost:8080/user/${id}`, {
+            const res = await fetch(`http://192.168.0.113:8080/user/${id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -123,7 +123,7 @@ export default function ConfirmationTable() {
   const descargarImagen = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/imagen/${id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/imagen/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -435,7 +435,7 @@ export default function ConfirmationTable() {
                             const body = { estado: nuevoEstado };
                             console.log('PATCH body:', body);
                             try {
-                              const res = await fetch(`http://localhost:8080/solicitudes/${s.id}`, {
+                              const res = await fetch(`http://192.168.0.113:8080/solicitudes/${s.id}`, {
                                 method: 'PATCH',
                                 headers: {
                                   'Content-Type': 'application/json',

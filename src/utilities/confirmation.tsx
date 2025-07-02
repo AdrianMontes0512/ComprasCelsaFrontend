@@ -19,7 +19,7 @@ const PAGE_SIZE = 14;
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
 const tipos = ['Producto', 'Servicio'];
-const estados = ['Pendiente', 'Aprobado', 'Rechazado']; // Ajusta según tus estados posibles
+const estados = ['Pendiente', 'Aprobado', 'Rechazado']; 
 
 export default function ConfirmationTable() {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
@@ -36,7 +36,7 @@ export default function ConfirmationTable() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+        const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -95,7 +95,7 @@ export default function ConfirmationTable() {
       await Promise.all(ids.map(async (id) => {
         if (!nuevos[id]) {
           try {
-            const res = await fetch(`http://localhost:8080/user/${id}`, {
+            const res = await fetch(`http://192.168.0.113:8080/user/${id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -115,7 +115,7 @@ export default function ConfirmationTable() {
   const descargarImagen = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/imagen/${id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/imagen/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -444,39 +444,106 @@ export default function ConfirmationTable() {
             </tbody>
           </table>
           {/* Paginación */}
-          <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+          <div style={{ 
+            marginTop: '2rem', 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap'
+          }}>
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
               style={{
-                padding: '0.5rem 1.2rem',
-                borderRadius: '8px',
-                border: '1px solid #f73317',
-                background: page === 1 ? '#eee' : '#fff',
-                color: '#f73317',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '12px',
+                border: 'none',
+                background: page === 1 
+                  ? 'rgba(255, 255, 255, 0.3)' 
+                  : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
+                color: page === 1 ? 'rgba(255, 255, 255, 0.6)' : '#fff',
                 fontWeight: 600,
+                fontSize: '0.95rem',
                 cursor: page === 1 ? 'not-allowed' : 'pointer',
+                boxShadow: page === 1 
+                  ? 'none' 
+                  : '0 4px 15px rgba(247, 51, 23, 0.3)',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase' as const,
+                minWidth: '120px'
+              }}
+              onMouseOver={e => {
+                if (page !== 1) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 51, 23, 0.4)';
+                }
+              }}
+              onMouseOut={e => {
+                if (page !== 1) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(247, 51, 23, 0.3)';
+                }
               }}
             >
-              Anterior
+              ← Anterior
             </button>
-            <span style={{ alignSelf: 'center', fontWeight: 500 }}>
+            
+            <div style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '12px',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              color: '#1f2937',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              minWidth: '150px',
+              textAlign: 'center' as const
+            }}>
               Página {page} de {totalPages}
-            </span>
+            </div>
+            
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               style={{
-                padding: '0.5rem 1.2rem',
-                borderRadius: '8px',
-                border: '1px solid #f73317',
-                background: page === totalPages ? '#eee' : '#fff',
-                color: '#f73317',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '12px',
+                border: 'none',
+                background: page === totalPages 
+                  ? 'rgba(255, 255, 255, 0.3)' 
+                  : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
+                color: page === totalPages ? 'rgba(255, 255, 255, 0.6)' : '#fff',
                 fontWeight: 600,
+                fontSize: '0.95rem',
                 cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                boxShadow: page === totalPages 
+                  ? 'none' 
+                  : '0 4px 15px rgba(247, 51, 23, 0.3)',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase' as const,
+                minWidth: '120px'
+              }}
+              onMouseOver={e => {
+                if (page !== totalPages) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 51, 23, 0.4)';
+                }
+              }}
+              onMouseOut={e => {
+                if (page !== totalPages) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(247, 51, 23, 0.3)';
+                }
               }}
             >
-              Siguiente
+              Siguiente →
             </button>
           </div>
         </>

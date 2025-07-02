@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, LogOut, User } from 'lucide-react';
 import bg6 from '../assets/bg2.jpg'; // Importa la imagen de fondo
 import logo from '../assets/logo.jpg'; // Importa el logo
@@ -7,11 +7,10 @@ import Formulario from '../utilities/Formulario';
 import Confirmation from '../utilities/confirmation';
 import Jefes from '../utilities/Jefes'; // Asegúrate de importar el componente
 
-
 export default function MainPage() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const firstName = localStorage.getItem('firstname') || '';
   const lastName = localStorage.getItem('lastname') || '';
   const email = localStorage.getItem('email') || '';
@@ -21,6 +20,24 @@ export default function MainPage() {
     localStorage.clear();
     navigate('/');
   };
+
+  // Cerrar dropdown cuando se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('[data-dropdown]')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <div
@@ -50,7 +67,7 @@ export default function MainPage() {
           zIndex: 1,
         }}
       />
-      
+
       {/* Header */}
       <header
         style={{
@@ -62,7 +79,7 @@ export default function MainPage() {
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
           borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
           position: 'relative',
-          zIndex: 2,
+          zIndex: 1000, // Aumentar z-index del header
         }}
       >
         {/* Logo */}
@@ -80,24 +97,28 @@ export default function MainPage() {
 
         {/* Center Section - Title and Role */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <h1 style={{ 
-            margin: 0, 
-            fontSize: '1.5rem', 
-            fontWeight: 600, 
-            color: '#333',
-            letterSpacing: '0.5px'
-          }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: '1.5rem',
+              fontWeight: 600,
+              color: '#333',
+              letterSpacing: '0.5px',
+            }}
+          >
             Sistema de Compras Celsa
           </h1>
-          <div style={{
-            fontSize: '0.85rem',
-            color: '#666',
-            backgroundColor: '#f0f0f0',
-            padding: '0.25rem 0.75rem',
-            borderRadius: '12px',
-            marginTop: '0.25rem',
-            fontWeight: 500
-          }}>
+          <div
+            style={{
+              fontSize: '0.85rem',
+              color: '#666',
+              backgroundColor: '#f0f0f0',
+              padding: '0.25rem 0.75rem',
+              borderRadius: '12px',
+              marginTop: '0.25rem',
+              fontWeight: 500,
+            }}
+          >
             {localStorage.getItem('role') === 'Empleado' && 'Panel de Empleado'}
             {localStorage.getItem('role') === 'Compras' && 'Panel de Compras'}
             {localStorage.getItem('role') === 'JefeArea' && 'Panel de Jefe de Área'}
@@ -105,29 +126,31 @@ export default function MainPage() {
         </div>
 
         {/* User Menu */}
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative' }} data-dropdown>
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDropdownOpen(!isDropdownOpen);
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
               padding: '0.5rem 1rem',
-              backgroundColor: 'transparent',
+              backgroundColor: isDropdownOpen ? '#f0f0f0' : 'transparent',
               border: '1px solid #ddd',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '0.9rem',
               color: '#333',
               transition: 'all 0.2s ease',
-              background: isDropdownOpen ? '#f0f0f0' : 'transparent',
             }}
-            onMouseOver={(e) => {
+            onMouseEnter={(e) => {
               if (!isDropdownOpen) {
                 e.currentTarget.style.backgroundColor = '#f8f8f8';
               }
             }}
-            onMouseOut={(e) => {
+            onMouseLeave={(e) => {
               if (!isDropdownOpen) {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }
@@ -135,8 +158,8 @@ export default function MainPage() {
           >
             <User size={18} />
             <span>{fullName}</span>
-            <ChevronDown 
-              size={16} 
+            <ChevronDown
+              size={16}
               style={{
                 transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                 transition: 'transform 0.2s ease',
@@ -155,10 +178,11 @@ export default function MainPage() {
                 backgroundColor: 'white',
                 border: '1px solid #ddd',
                 borderRadius: '8px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
                 minWidth: '250px',
-                zIndex: 9999,
+                zIndex: 9999, // Z-index muy alto
                 overflow: 'hidden',
+                animation: 'fadeIn 0.2s ease-out',
               }}
             >
               {/* User Info */}
@@ -179,7 +203,10 @@ export default function MainPage() {
 
               {/* Logout Button */}
               <button
-                onClick={handleLogout}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLogout();
+                }}
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
@@ -193,10 +220,10 @@ export default function MainPage() {
                   gap: '0.5rem',
                   transition: 'background-color 0.2s ease',
                 }}
-                onMouseOver={(e) => {
+                onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#fef2f2';
                 }}
-                onMouseOut={(e) => {
+                onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
@@ -222,7 +249,6 @@ export default function MainPage() {
           position: 'relative',
           zIndex: 2,
         }}
-        onClick={() => setIsDropdownOpen(false)} // Close dropdown when clicking outside
       >
         {localStorage.getItem('role') === 'Empleado' && <Formulario />}
         {localStorage.getItem('role') === 'Compras' && (
@@ -260,6 +286,22 @@ export default function MainPage() {
           </div>
         )}
       </div>
+
+      {/* Agregar estilos CSS para la animación */}
+      <style>
+        {`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }
