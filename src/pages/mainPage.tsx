@@ -119,7 +119,7 @@ export default function MainPage() {
               fontWeight: 500,
             }}
           >
-            {localStorage.getItem('role') === 'Empleado' && 'Panel de Empleado'}
+            {localStorage.getItem('role') === 'Empleado' && 'Panel de Colaborador'}
             {localStorage.getItem('role') === 'Compras' && 'Panel de Compras'}
             {localStorage.getItem('role') === 'JefeArea' && 'Panel de Jefe de Área'}
           </div>

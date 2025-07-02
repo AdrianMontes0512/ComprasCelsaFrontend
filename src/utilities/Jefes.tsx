@@ -13,6 +13,7 @@ interface Solicitud {
   moneda: string;
   estado: string;
   usuarioId: number;
+  ordenCompra?: string;
 }
 
 const PAGE_SIZE = 14;
@@ -45,7 +46,7 @@ export default function ConfirmationTable() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://192.168.0.113:8080/solicitudes/jefe?page=${page - 1}&size=${PAGE_SIZE}`, {
+        const res = await fetch(`http://localhost:8080/solicitudes/jefe?page=${page - 1}&size=${PAGE_SIZE}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -83,6 +84,7 @@ export default function ConfirmationTable() {
       Unidad: s.umedida,
       Moneda: s.moneda,
       Estado: s.estado,
+      'Orden de Compra': s.ordenCompra || 'Sin asignar',
       Usuario: usuarios[s.usuarioId] || 'Desconocido',
     }));
 
@@ -103,7 +105,7 @@ export default function ConfirmationTable() {
       await Promise.all(ids.map(async (id) => {
         if (!nuevos[id]) {
           try {
-            const res = await fetch(`http://192.168.0.113:8080/user/${id}`, {
+            const res = await fetch(`http://localhost:8080/user/${id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -123,7 +125,7 @@ export default function ConfirmationTable() {
   const descargarImagen = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://192.168.0.113:8080/solicitudes/imagen/${id}`, {
+      const res = await fetch(`http://localhost:8080/solicitudes/imagen/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -323,7 +325,8 @@ export default function ConfirmationTable() {
                 <th style={thStyle}>📏 Unidad</th>
                 <th style={thStyle}>💱 Moneda</th>
                 <th style={thStyle}>📊 Estado</th>
-                <th style={thStyle}>👤 Usuario</th>
+                <th style={thStyle}>� Orden de Compra</th>
+                <th style={thStyle}>�👤 Usuario</th>
                 <th style={thStyle}>🖼️ Imagen</th>
               </tr>
             </thead>
@@ -435,7 +438,7 @@ export default function ConfirmationTable() {
                             const body = { estado: nuevoEstado };
                             console.log('PATCH body:', body);
                             try {
-                              const res = await fetch(`http://192.168.0.113:8080/solicitudes/${s.id}`, {
+                              const res = await fetch(`http://localhost:8080/solicitudes/${s.id}`, {
                                 method: 'PATCH',
                                 headers: {
                                   'Content-Type': 'application/json',
@@ -483,6 +486,32 @@ export default function ConfirmationTable() {
                         <option key={est} value={est}>{est}</option>
                       ))}
                     </select>
+                  </td>
+                  <td style={tdStyle}>
+                    {s.ordenCompra ? (
+                      <span style={{
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: '12px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        backgroundColor: '#e0f2fe',
+                        color: '#0369a1',
+                        border: '1px solid #0ea5e9',
+                        display: 'inline-block',
+                        minWidth: '80px',
+                        textAlign: 'center'
+                      }}>
+                        {s.ordenCompra}
+                      </span>
+                    ) : (
+                      <span style={{
+                        color: '#9ca3af',
+                        fontSize: '0.85rem',
+                        fontStyle: 'italic'
+                      }}>
+                        Sin asignar
+                      </span>
+                    )}
                   </td>
                   <td style={tdStyle}>{usuarios[s.usuarioId] || 'Cargando...'}</td>
                   <td style={tdStyle}>

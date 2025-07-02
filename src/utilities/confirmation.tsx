@@ -13,6 +13,7 @@ interface Solicitud {
   moneda: string;
   estado: string;
   usuarioId: number;
+  ordenCompra?: string;
 }
 
 const PAGE_SIZE = 14;
@@ -30,13 +31,24 @@ export default function ConfirmationTable() {
   const [filtroTipo, setFiltroTipo] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
   const [usuarios, setUsuarios] = useState<{ [id: number]: string }>({});
+  
+  // Estados para el modal de orden de compra
+  const [showOrdenModal, setShowOrdenModal] = useState(false);
+  const [modalOrdenData, setModalOrdenData] = useState<{
+    solicitud: Solicitud;
+    ordenCompra: string;
+    valorOriginal: string;
+    inputRef: HTMLInputElement;
+    onConfirm: () => void;
+    onCancel: () => void;
+  } | null>(null);
 
   useEffect(() => {
     const fetchSolicitudes = async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+        const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -74,6 +86,7 @@ export default function ConfirmationTable() {
       Unidad: s.umedida,
       Moneda: s.moneda,
       Estado: s.estado,
+      'Orden de Compra': s.ordenCompra || 'Sin asignar',
       Usuario: usuarios[s.usuarioId] || 'Desconocido',
       // Imagen: `http://localhost:8080/solicitudes/imagen/${s.id}`, // <-- Quitado del Excel
     }));
@@ -95,7 +108,7 @@ export default function ConfirmationTable() {
       await Promise.all(ids.map(async (id) => {
         if (!nuevos[id]) {
           try {
-            const res = await fetch(`http://192.168.0.113:8080/user/${id}`, {
+            const res = await fetch(`http://localhost:8080/user/${id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -115,7 +128,7 @@ export default function ConfirmationTable() {
   const descargarImagen = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://192.168.0.113:8080/solicitudes/imagen/${id}`, {
+      const res = await fetch(`http://localhost:8080/solicitudes/imagen/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -288,7 +301,7 @@ export default function ConfirmationTable() {
           >
             <thead>
               <tr style={{ background: 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)', color: '#fff' }}>
-                <th style={thStyle}>🆔 ID</th>
+                <th style={thStyle}>🆔 </th>
                 <th style={thStyle}>🔥 Prioridad</th>
                 <th style={thStyle}>📦 Tipo</th>
                 <th style={thStyle}>📝 Descripción</th>
@@ -297,7 +310,8 @@ export default function ConfirmationTable() {
                 <th style={thStyle}>📏 Unidad</th>
                 <th style={thStyle}>💱 Moneda</th>
                 <th style={thStyle}>📊 Estado</th>
-                <th style={thStyle}>👤 Usuario</th>
+                <th style={thStyle}>� Orden de Compra</th>
+                <th style={thStyle}>�👤 Usuario</th>
                 <th style={thStyle}>🖼️ Imagen</th>
               </tr>
             </thead>
@@ -406,6 +420,152 @@ export default function ConfirmationTable() {
                     }}>
                       {s.estado}
                     </span>
+                  </td>
+                  <td style={tdStyle}>
+                    {s.estado === 'Aprobado' ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                        <input
+                          type="text"
+                          placeholder="ID Orden"
+                          defaultValue={s.ordenCompra || ''}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              const nuevoValor = e.currentTarget.value.trim();
+                              
+                              // Si el valor no cambió, no hacer nada
+                              if (nuevoValor === (s.ordenCompra || '')) return;
+                              
+                              // Mostrar modal de confirmación
+                              const inputRef = e.currentTarget as HTMLInputElement;
+                              const valorOriginal = s.ordenCompra || '';
+                              setModalOrdenData({
+                                solicitud: s,
+                                ordenCompra: nuevoValor,
+                                valorOriginal: valorOriginal,
+                                inputRef: inputRef,
+                                onConfirm: async () => {
+                                  const token = localStorage.getItem('token');
+                                  const body = { ordenCompra: nuevoValor };
+                                  console.log('PATCH orden compra body:', body);
+                                  try {
+                                    const res = await fetch(`http://localhost:8080/solicitudes/${s.id}`, {
+                                      method: 'PATCH',
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                        Authorization: `Bearer ${token}`,
+                                      },
+                                      body: JSON.stringify(body),
+                                    });
+                                    if (res.ok) {
+                                      setSolicitudes((prev) =>
+                                        prev.map((sol) =>
+                                          sol.id === s.id ? { ...sol, ordenCompra: nuevoValor } : sol
+                                        )
+                                      );
+                                    } else {
+                                      const errorText = await res.text();
+                                      alert('❌ Error al actualizar orden de compra: ' + errorText);
+                                    }
+                                  } catch (err) {
+                                    alert('❌ Error de conexión');
+                                  }
+                                  setShowOrdenModal(false);
+                                  setModalOrdenData(null);
+                                },                              onCancel: () => {
+                                // Revertir el input al valor original usando la referencia guardada
+                                inputRef.value = valorOriginal;
+                                setShowOrdenModal(false);
+                                setModalOrdenData(null);
+                              }
+                              });
+                              setShowOrdenModal(true);
+                            }
+                          }}
+                          onBlur={(e) => {
+                            // Primero aplicar estilos
+                            e.target.style.borderColor = '#e5e7eb';
+                            e.target.style.boxShadow = 'none';
+                            
+                            // Luego verificar si hay cambios
+                            const nuevoValor = e.currentTarget.value.trim();
+                            
+                            // Si el valor no cambió, no hacer nada
+                            if (nuevoValor === (s.ordenCompra || '')) return;
+                            
+                            // Mostrar modal de confirmación
+                            const inputRef = e.currentTarget as HTMLInputElement;
+                            const valorOriginal = s.ordenCompra || '';
+                            setModalOrdenData({
+                              solicitud: s,
+                              ordenCompra: nuevoValor,
+                              valorOriginal: valorOriginal,
+                              inputRef: inputRef,
+                              onConfirm: async () => {
+                                const token = localStorage.getItem('token');
+                                const body = { ordenCompra: nuevoValor };
+                                console.log('PATCH orden compra body:', body);
+                                try {
+                                  const res = await fetch(`http://localhost:8080/solicitudes/${s.id}`, {
+                                    method: 'PATCH',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      Authorization: `Bearer ${token}`,
+                                    },
+                                    body: JSON.stringify(body),
+                                  });
+                                  if (res.ok) {
+                                    setSolicitudes((prev) =>
+                                      prev.map((sol) =>
+                                        sol.id === s.id ? { ...sol, ordenCompra: nuevoValor } : sol
+                                      )
+                                    );
+                                  } else {
+                                    const errorText = await res.text();
+                                    alert('❌ Error al actualizar orden de compra: ' + errorText);
+                                  }
+                                } catch (err) {
+                                  alert('❌ Error de conexión');
+                                }
+                                setShowOrdenModal(false);
+                                setModalOrdenData(null);
+                              },
+                              onCancel: () => {
+                                // Revertir el input al valor original usando la referencia guardada
+                                inputRef.value = valorOriginal;
+                                setShowOrdenModal(false);
+                                setModalOrdenData(null);
+                              }
+                            });
+                            setShowOrdenModal(true);
+                          }}
+                          style={{
+                            padding: '0.5rem 0.75rem',
+                            borderRadius: '8px',
+                            border: '2px solid #e5e7eb',
+                            fontSize: '0.85rem',
+                            fontWeight: 500,
+                            backgroundColor: '#fff',
+                            color: '#374151',
+                            outline: 'none',
+                            width: '120px',
+                            textAlign: 'center',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onFocus={e => {
+                            e.target.style.borderColor = '#f73317';
+                            e.target.style.boxShadow = '0 0 0 3px rgba(247, 51, 23, 0.1)';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <span style={{
+                        color: '#9ca3af',
+                        fontSize: '0.85rem',
+                        fontStyle: 'italic'
+                      }}>
+                        Falta de aprobación
+                      </span>
+                    )}
                   </td>
                   <td style={tdStyle}>{usuarios[s.usuarioId] || 'Cargando...'}</td>
                   <td style={tdStyle}>
@@ -548,6 +708,180 @@ export default function ConfirmationTable() {
           </div>
         </>
       )}
+
+      {/* Modal de Confirmación para Orden de Compra */}
+      {showOrdenModal && modalOrdenData && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '20px',
+            padding: '2.5rem',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+            maxWidth: '500px',
+            width: '90%',
+            transform: 'scale(1)',
+            animation: 'modalAppear 0.3s ease-out'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1rem'
+              }}>
+                🛒
+              </div>
+              <h3 style={{
+                color: '#1f2937',
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                margin: 0,
+                marginBottom: '0.5rem'
+              }}>
+                Confirmar Orden de Compra
+              </h3>
+            </div>
+
+            <div style={{
+              backgroundColor: '#f0f9ff',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              marginBottom: '2rem',
+              border: '2px solid #0ea5e9'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1rem'
+              }}>
+                <div style={{ fontSize: '1.5rem' }}>ℹ️</div>
+                <div style={{ fontWeight: 600, color: '#0c4a6e' }}>
+                  Asignar ID de Orden de Compra
+                </div>
+              </div>
+              
+              <div style={{ color: '#0369a1', lineHeight: '1.5', marginBottom: '1rem' }}>
+                Está a punto de asignar el ID de orden de compra <strong>"{modalOrdenData.ordenCompra}"</strong> a la solicitud #{modalOrdenData.solicitud.id}.
+              </div>
+
+              <div style={{
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                padding: '1rem',
+                border: '1px solid #e0f2fe'
+              }}>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, color: '#374151' }}>Solicitud: </span>
+                  <span style={{ 
+                    backgroundColor: '#dbeafe', 
+                    color: '#1e40af', 
+                    padding: '0.25rem 0.5rem', 
+                    borderRadius: '6px',
+                    fontWeight: 600
+                  }}>
+                    #{modalOrdenData.solicitud.id}
+                  </span>
+                </div>
+                
+                <div>
+                  <span style={{ fontWeight: 600, color: '#374151' }}>Descripción: </span>
+                  <span style={{ color: '#6b7280' }}>
+                    {modalOrdenData.solicitud.descripcion}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={modalOrdenData.onCancel}
+                style={{
+                  padding: '0.75rem 2rem',
+                  borderRadius: '12px',
+                  border: '2px solid #e5e7eb',
+                  backgroundColor: '#fff',
+                  color: '#374151',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.backgroundColor = '#f9fafb';
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.backgroundColor = '#fff';
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                }}
+              >
+                ❌ Cancelar
+              </button>
+              
+              <button
+                onClick={modalOrdenData.onConfirm}
+                style={{
+                  padding: '0.75rem 2rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 15px rgba(14, 165, 233, 0.3)'
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(14, 165, 233, 0.4)';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(14, 165, 233, 0.3)';
+                }}
+              >
+                ✅ Confirmar Asignación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CSS Animation */}
+      <style>
+        {`
+          @keyframes modalAppear {
+            0% { 
+              transform: scale(0.8);
+              opacity: 0;
+            }
+            100% { 
+              transform: scale(1);
+              opacity: 1;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }
