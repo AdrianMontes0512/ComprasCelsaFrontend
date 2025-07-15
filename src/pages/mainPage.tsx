@@ -15,6 +15,7 @@ export default function MainPage() {
   const lastName = localStorage.getItem('lastname') || '';
   const email = localStorage.getItem('email') || '';
   const fullName = `${firstName} ${lastName}`;
+  const userRole = localStorage.getItem('role') || '';
 
   const handleLogout = () => {
     localStorage.clear();
@@ -62,7 +63,9 @@ export default function MainPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          backgroundColor: userRole === 'TMLIMA' 
+            ? 'rgba(0, 0, 0, 0.4)'  // Azul oscuro para TMLIMA
+            : 'rgba(0, 0, 0, 0.4)',      // Negro para otros roles
           backdropFilter: 'blur(2px)',
           zIndex: 1,
         }}
@@ -112,16 +115,18 @@ export default function MainPage() {
             style={{
               fontSize: '0.85rem',
               color: '#666',
-              backgroundColor: '#f0f0f0',
+              backgroundColor: userRole === 'TMLIMA' ? 'rgba(59, 130, 246, 0.1)' : '#f0f0f0',
               padding: '0.25rem 0.75rem',
               borderRadius: '12px',
               marginTop: '0.25rem',
               fontWeight: 500,
+              border: userRole === 'TMLIMA' ? '1px solid rgba(59, 130, 246, 0.3)' : 'none',
             }}
           >
             {localStorage.getItem('role') === 'Empleado' && 'Panel de Colaborador'}
             {localStorage.getItem('role') === 'Compras' && 'Panel de Compras'}
             {localStorage.getItem('role') === 'JefeArea' && 'Panel de Jefe de Área'}
+            {localStorage.getItem('role') === 'TMLIMA' && 'Panel de TMLIMA'}
           </div>
         </div>
 
@@ -251,6 +256,7 @@ export default function MainPage() {
         }}
       >
         {localStorage.getItem('role') === 'Empleado' && <Formulario />}
+        {localStorage.getItem('role') === 'TMLIMA' && <Formulario />}
         {localStorage.getItem('role') === 'Compras' && (
           <div
             style={{

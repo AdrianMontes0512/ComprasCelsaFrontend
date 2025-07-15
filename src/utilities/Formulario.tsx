@@ -48,6 +48,38 @@ function FormularioIndividual({
   const [imageData, setImageData] = useState<string | null>(formData?.imageData || null);
   const [sending] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [areas, setAreas] = useState<string[]>([]);
+  const [loadingAreas, setLoadingAreas] = useState(false);
+  
+  const userRole = localStorage.getItem('role') || '';
+
+  // Cargar áreas al montar el componente
+  useEffect(() => {
+    const fetchAreas = async () => {
+      setLoadingAreas(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/areas/all', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAreas(data);
+        } else {
+          console.error('Error al obtener las áreas:', response.status);
+        }
+      } catch (error) {
+        console.error('Error en la petición de áreas:', error);
+      } finally {
+        setLoadingAreas(false);
+      }
+    };
+
+    fetchAreas();
+  }, []);
 
   // Sincronizar con props cuando formData cambia
   useEffect(() => {
@@ -56,6 +88,17 @@ function FormularioIndividual({
       setImageData(formData.imageData);
     }
   }, [formData]);
+
+  // Establecer centro de costos automáticamente para TMLIMA
+  useEffect(() => {
+    if (userRole === 'TMLIMA' && form.centrocosto !== 'TMLIMA') {
+      const newForm = { ...form, centrocosto: 'TMLIMA' };
+      setForm(newForm);
+      if (onFormChange) {
+        onFormChange('centrocosto', 'TMLIMA');
+      }
+    }
+  }, [userRole, form.centrocosto, onFormChange]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const newForm = { ...form, [e.target.name]: e.target.value };
@@ -252,14 +295,37 @@ function FormularioIndividual({
         <label style={formStyles.label}>
           <FaBuilding style={formStyles.icon} /> Centro de costos
         </label>
-        <input
-          name="centrocosto"
-          value={form.centrocosto}
-          onChange={handleChange}
-          placeholder="Ingrese el centro de costos"
-          required
-          style={formStyles.input}
-        />
+        {userRole === 'TMLIMA' ? (
+          <input
+            name="centrocosto"
+            value="TMLIMA"
+            readOnly
+            style={{
+              ...formStyles.input,
+              backgroundColor: '#f5f5f5',
+              color: '#666',
+              cursor: 'not-allowed'
+            }}
+          />
+        ) : (
+          <select
+            name="centrocosto"
+            value={form.centrocosto}
+            onChange={handleChange}
+            required
+            style={formStyles.select}
+            disabled={loadingAreas}
+          >
+            <option value="">
+              {loadingAreas ? 'Cargando áreas...' : 'Seleccione un centro de costos'}
+            </option>
+            {areas.map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       
       <div style={formStyles.fieldGroup}>
@@ -418,11 +484,13 @@ function FormularioIndividual({
 
 export default function Formulario() {
   const usuarioId = Number(localStorage.getItem('userId'));
+  const userRole = localStorage.getItem('role') || '';
+  
   const [formularios, setFormularios] = useState([{
     id: 0,
     form: {
       prioridad: '',
-      centrocosto: '',
+      centrocosto: userRole === 'TMLIMA' ? 'TMLIMA' : '',
       sp: '',
       descripcion: '',
       maquina: '',
@@ -474,7 +542,7 @@ export default function Formulario() {
         id: newId,
         form: {
           prioridad: '',
-          centrocosto: '',
+          centrocosto: userRole === 'TMLIMA' ? 'TMLIMA' : '',
           sp: '',
           descripcion: '',
           maquina: '',
@@ -607,7 +675,7 @@ export default function Formulario() {
               id: 0,
               form: {
                 prioridad: '',
-                centrocosto: '',
+                centrocosto: userRole === 'TMLIMA' ? 'TMLIMA' : '',
                 sp: '',
                 descripcion: '',
                 maquina: '',
@@ -632,7 +700,7 @@ export default function Formulario() {
                   id: 0,
                   form: {
                     prioridad: '',
-                    centrocosto: '',
+                    centrocosto: userRole === 'TMLIMA' ? 'TMLIMA' : '',
                     sp: '',
                     descripcion: '',
                     maquina: '',

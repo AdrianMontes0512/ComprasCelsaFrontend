@@ -308,11 +308,11 @@ export default function ConfirmationTable() {
                 <th style={thStyle}>🔢 Cantidad</th>
                 <th style={thStyle}>💰 Precio</th>
                 <th style={thStyle}>📏 Unidad</th>
-                <th style={thStyle}>💱 Moneda</th>
+                <th style={thStyle}>Moneda</th>
                 <th style={thStyle}>📊 Estado</th>
-                <th style={thStyle}>� Orden de Compra</th>
-                <th style={thStyle}>�👤 Usuario</th>
-                <th style={thStyle}>🖼️ Imagen</th>
+                <th style={thStyle}>Orden de Compra</th>
+                <th style={thStyle}>👤 Usuario</th>
+                <th style={thStyle}>🖼️ Archivo</th>
               </tr>
             </thead>
             <tbody>

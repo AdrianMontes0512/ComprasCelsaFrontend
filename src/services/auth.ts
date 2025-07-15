@@ -19,3 +19,14 @@ export const Login = async (loginData: {
     throw error;
   }
 };
+
+export const VerifyToken = async (token: string) => {
+  token = localStorage.getItem('token') || '';
+  try{
+    const response = await API_AUTH.post('/verify-token', { token });
+    return response.data;
+  } catch (error) {
+    console.error('Problema al verificar el token', error);
+    throw error;
+  }
+}
