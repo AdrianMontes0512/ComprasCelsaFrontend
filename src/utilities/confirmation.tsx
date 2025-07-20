@@ -14,6 +14,9 @@ interface Solicitud {
   estado: string;
   usuarioId: number;
   ordenCompra?: string;
+  motivo: string;
+  familia: string;
+  subFamilia: string;
 }
 
 const PAGE_SIZE = 14;
@@ -81,6 +84,9 @@ export default function ConfirmationTable() {
       Prioridad: s.prioridad,
       Tipo: s.sp,
       Descripción: s.descripcion,
+      Motivo: s.motivo,
+      Familia: s.familia,
+      Subfamilia: s.subFamilia,
       Cantidad: s.cantidad,
       Precio: s.precio,
       Unidad: s.umedida,
@@ -305,7 +311,10 @@ export default function ConfirmationTable() {
                 <th style={thStyle}>🔥 Prioridad</th>
                 <th style={thStyle}>📦 Tipo</th>
                 <th style={thStyle}>📝 Descripción</th>
-                <th style={thStyle}>🔢 Cantidad</th>
+                <th style={thStyle}>� Motivo</th>
+                <th style={thStyle}>🏷️ Familia</th>
+                <th style={thStyle}>🔖 Subfamilia</th>
+                <th style={thStyle}>�🔢 Cantidad</th>
                 <th style={thStyle}>💰 Precio</th>
                 <th style={thStyle}>📏 Unidad</th>
                 <th style={thStyle}>Moneda</th>
@@ -381,6 +390,44 @@ export default function ConfirmationTable() {
                     }} title={s.descripcion}>
                       {s.descripcion}
                     </div>
+                  </td>
+                  <td style={tdStyle}>
+                    <div style={{
+                      maxWidth: '150px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap' as const,
+                      fontSize: '0.85rem',
+                      color: '#6b7280'
+                    }} title={s.motivo}>
+                      {s.motivo}
+                    </div>
+                  </td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      padding: '0.3rem 0.6rem',
+                      borderRadius: '12px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      backgroundColor: '#f3f4f6',
+                      color: '#4b5563',
+                      border: '1px solid #d1d5db'
+                    }}>
+                      {s.familia}
+                    </span>
+                  </td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      padding: '0.3rem 0.6rem',
+                      borderRadius: '12px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      backgroundColor: '#fef3c7',
+                      color: '#92400e',
+                      border: '1px solid #fbbf24'
+                    }}>
+                      {s.subFamilia}
+                    </span>
                   </td>
                   <td style={tdStyle}>
                     <span style={{

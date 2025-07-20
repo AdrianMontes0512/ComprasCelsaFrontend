@@ -6,6 +6,10 @@ const sps = ['Producto', 'Servicio','Activo'];
 const umedidas = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego'];
 const monedas = ['Dolares', 'Soles', 'Euros'];
 
+// Opciones para los nuevos campos
+const familias = ['Electricidad', 'Mecánica', 'Hidráulica', 'Neumática', 'Electrónica', 'Instrumentación', 'Otros'];
+const subFamilias = ['Motores', 'Sensores', 'Válvulas', 'Cables', 'Herramientas', 'Repuestos', 'Consumibles', 'Otros'];
+
 interface FormularioProps {
   usuarioId?: number;
   formData?: {
@@ -20,6 +24,9 @@ interface FormularioProps {
       precio: string;
       umedida: string;
       moneda: string;
+      motivo: string;
+      familia: string;
+      subFamilia: string;
     };
     imageData: string | null;
   };
@@ -44,6 +51,9 @@ function FormularioIndividual({
     precio: '',
     umedida: '',
     moneda: '',
+    motivo: '',
+    familia: '',
+    subFamilia: '',
   });
   const [imageData, setImageData] = useState<string | null>(formData?.imageData || null);
   const [sending] = useState(false);
@@ -53,7 +63,6 @@ function FormularioIndividual({
   
   const userRole = localStorage.getItem('role') || '';
 
-  // Cargar áreas al montar el componente
   useEffect(() => {
     const fetchAreas = async () => {
       setLoadingAreas(true);
@@ -372,6 +381,58 @@ function FormularioIndividual({
           style={formStyles.input}
         />
       </div>
+
+      <div style={formStyles.fieldGroup}>
+        <label style={formStyles.label}>
+          <FaFileAlt style={formStyles.icon} /> Motivo
+        </label>
+        <input
+          name="motivo"
+          value={form.motivo}
+          onChange={handleChange}
+          placeholder="Motivo de la solicitud"
+          required
+          style={formStyles.input}
+        />
+      </div>
+      
+      <div style={formStyles.fieldRow}>
+        <div style={{...formStyles.fieldGroup, flex: 1}}>
+          <label style={formStyles.label}>
+            <FaBoxOpen style={formStyles.icon} /> Familia
+          </label>
+          <select
+            name="familia"
+            value={form.familia}
+            onChange={handleChange}
+            required
+            style={formStyles.select}
+          >
+            <option value="">Seleccione familia</option>
+            {familias.map((f) => (
+              <option key={f} value={f}>{f}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div style={{...formStyles.fieldGroup, flex: 1}}>
+          <label style={formStyles.label}>
+            <FaBoxOpen style={formStyles.icon} /> Subfamilia
+          </label>
+          <select
+            name="subFamilia"
+            value={form.subFamilia}
+            onChange={handleChange}
+            required
+            style={formStyles.select}
+          >
+            <option value="">Seleccione subfamilia</option>
+            {subFamilias.map((sf) => (
+              <option key={sf} value={sf}>{sf}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       
       <div style={formStyles.fieldRow}>
         <div style={{...formStyles.fieldGroup, flex: 1}}>
@@ -498,11 +559,15 @@ export default function Formulario() {
       precio: '',
       umedida: '',
       moneda: '',
+      motivo: '',
+      familia: '',
+      subFamilia: '',
     },
     imageData: null as string | null
   }]);
   const [activeTab, setActiveTab] = useState(0);
   const [sending, setSending] = useState(false);
+  const [modalSending, setModalSending] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<{
     onConfirm: () => void;
@@ -550,6 +615,9 @@ export default function Formulario() {
           precio: '',
           umedida: '',
           moneda: '',
+          motivo: '',
+          familia: '',
+          subFamilia: '',
         },
         imageData: null
       }]);
@@ -567,7 +635,7 @@ export default function Formulario() {
   };
 
   const validateForm = (form: any) => {
-    const required = ['prioridad', 'centrocosto', 'sp', 'descripcion', 'cantidad', 'precio', 'umedida', 'moneda'];
+    const required = ['prioridad', 'centrocosto', 'sp', 'descripcion', 'cantidad', 'precio', 'umedida', 'moneda', 'motivo', 'familia', 'subFamilia'];
     return required.every(field => form[field] && form[field].trim() !== '');
   };
 
@@ -585,6 +653,7 @@ export default function Formulario() {
 
     setModalData({
       onConfirm: async () => {
+        setModalSending(true);
         setSending(true);
         try {
           const token = localStorage.getItem('token');
@@ -592,6 +661,7 @@ export default function Formulario() {
           if (!token) {
             alert('❌ Error: No hay token de autenticación. Por favor, inicie sesión nuevamente.');
             setSending(false);
+            setModalSending(false);
             setShowModal(false);
             setModalData(null);
             return;
@@ -683,6 +753,9 @@ export default function Formulario() {
                 precio: '',
                 umedida: '',
                 moneda: '',
+                motivo: '',
+                familia: '',
+                subFamilia: '',
               },
               imageData: null
             }]);
@@ -708,6 +781,9 @@ export default function Formulario() {
                     precio: '',
                     umedida: '',
                     moneda: '',
+                    motivo: '',
+                    familia: '',
+                    subFamilia: '',
                   },
                   imageData: null
                 }]);
@@ -722,6 +798,7 @@ export default function Formulario() {
           alert('❌ Error de conexión al servidor');
         } finally {
           setSending(false);
+          setModalSending(false);
           setShowModal(false);
           setModalData(null);
         }
@@ -1550,28 +1627,58 @@ export default function Formulario() {
               
               <button
                 onClick={modalData.onConfirm}
+                disabled={modalSending}
                 style={{
                   padding: '0.75rem 2rem',
                   borderRadius: '12px',
                   border: 'none',
-                  background: 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
+                  background: modalSending 
+                    ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                    : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
                   color: '#fff',
                   fontWeight: 600,
                   fontSize: '1rem',
-                  cursor: 'pointer',
+                  cursor: modalSending ? 'not-allowed' : 'pointer',
                   transition: 'all 0.2s ease',
-                  boxShadow: '0 4px 15px rgba(247, 51, 23, 0.3)'
+                  boxShadow: modalSending 
+                    ? 'none' 
+                    : '0 4px 15px rgba(247, 51, 23, 0.3)',
+                  opacity: modalSending ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
                 }}
                 onMouseOver={e => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 51, 23, 0.4)';
+                  if (!modalSending) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 51, 23, 0.4)';
+                  }
                 }}
                 onMouseOut={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(247, 51, 23, 0.3)';
+                  if (!modalSending) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(247, 51, 23, 0.3)';
+                  }
                 }}
               >
-                ✅ Confirmar y Enviar
+                {modalSending ? (
+                  <>
+                    <div style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      borderTop: '2px solid #fff',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    ✅ Confirmar y Enviar
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -1590,6 +1697,11 @@ export default function Formulario() {
               transform: scale(1);
               opacity: 1;
             }
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
         `}
       </style>
