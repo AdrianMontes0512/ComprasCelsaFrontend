@@ -2,13 +2,20 @@ import { useState, useEffect } from 'react';
 import { FaExclamationCircle, FaBoxOpen, FaFileAlt, FaCalculator, FaDollarSign, FaRuler, FaMoneyBillWave, FaImage, FaPaperPlane, FaPlus, FaCogs, FaCheck, FaTimes, FaHistory, FaEye, FaBuilding } from 'react-icons/fa';
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
-const sps = ['Producto', 'Servicio','Activo'];
+const sps = ['Producto', 'Servicio'];
 const umedidas = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego'];
 const monedas = ['Dolares', 'Soles', 'Euros'];
 
-// Opciones para los nuevos campos
-const familias = ['Electricidad', 'Mecánica', 'Hidráulica', 'Neumática', 'Electrónica', 'Instrumentación', 'Otros'];
-const subFamilias = ['Motores', 'Sensores', 'Válvulas', 'Cables', 'Herramientas', 'Repuestos', 'Consumibles', 'Otros'];
+const familiasYSubfamilias = {
+  'Repuesto': ['Accesorios', 'Bunchadora', 'Compresoras', 'Extrusoras', 'Fajas', 'Montacargas', 'Rep. Electricos', 'Rep. Neumaticos', 'Retenes y O-Ring', 'Rodamientos', 'Trefiladores'],
+  'Herramientas': ['Herramientas / Produccion', 'Herramientas de Cableado', 'Herramientas de Extrusion', 'Herramientas de medicion', 'Herramientas Mecanicos / Electrico', 'Herramientas Metradoras y Cortad', 'Hileras de Cableado', 'Hileras de Trefilacion', 'Maquinaria y Equipos'],
+  'Servicio de Maestranza': ['Servicio Calibracion', 'Servicio de Inspeccion', 'Servicio Mantenimiento de Montac', 'Servicio Tecnico', 'Servicios de Ingenieria', 'Servicios de Maestranza', 'Servicios Electricos', 'Servicios Mecanicos'],
+  'Servicios': ['Servicios Generales'],
+  'Suministros': ['Suministros de planta', 'BANDEJA DE METAL 3 PISOS ES', 'CARRITO PORTA BALONES DE', 'Combustibles y Lubricantes', 'DISPENSADOR DE ZUNCHO ME', 'Mercaderias', 'Suministros de Imprenta', 'Suministros de Limpieza', 'Suministros de Mantenimiento', 'Suministros de Oficina', 'Suministros de Planta', 'Suministros Electricos', 'Suministros Gasfiteria', 'Uniformes Equipos de Seguridad'],
+  'Suministros de oficina': ['Mobiliario Oficina', 'SERVICIO DE CUENTAS DE COR', 'Suministros de computo', 'Suministros de Oficina']
+};
+
+const familias = Object.keys(familiasYSubfamilias);
 
 interface FormularioProps {
   usuarioId?: number;
@@ -110,11 +117,26 @@ function FormularioIndividual({
   }, [userRole, form.centrocosto, onFormChange]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const newForm = { ...form, [e.target.name]: e.target.value };
+    const fieldName = e.target.name;
+    const value = e.target.value;
+    
+    let newForm = { ...form, [fieldName]: value };
+    
+    // Si cambió la familia, resetear la subfamilia
+    if (fieldName === 'familia') {
+      newForm = { ...newForm, subFamilia: '' };
+    }
+    
     setForm(newForm);
     setSuccess(false);
+    
+    // Siempre notificar los cambios a los componentes padre
     if (onFormChange) {
-      onFormChange(e.target.name, e.target.value);
+      onFormChange(fieldName, value);
+      // Si cambió la familia, también notificar que la subfamilia se reseteo
+      if (fieldName === 'familia') {
+        onFormChange('subFamilia', '');
+      }
     }
   };
 
@@ -425,9 +447,12 @@ function FormularioIndividual({
             onChange={handleChange}
             required
             style={formStyles.select}
+            disabled={!form.familia}
           >
-            <option value="">Seleccione subfamilia</option>
-            {subFamilias.map((sf) => (
+            <option value="">
+              {!form.familia ? 'Primero seleccione una familia' : 'Seleccione subfamilia'}
+            </option>
+            {form.familia && familiasYSubfamilias[form.familia as keyof typeof familiasYSubfamilias]?.map((sf: string) => (
               <option key={sf} value={sf}>{sf}</option>
             ))}
           </select>
@@ -585,11 +610,19 @@ export default function Formulario() {
   const MAX_FORMULARIOS = 10;
 
   const handleFormChange = (formIndex: number, field: string, value: string) => {
-    setFormularios(prev => prev.map((item, index) => 
-      index === formIndex 
-        ? { ...item, form: { ...item.form, [field]: value } }
-        : item
-    ));
+    setFormularios(prev => prev.map((item, index) => {
+      if (index === formIndex) {
+        let newForm = { ...item.form, [field]: value };
+        
+        // Si cambió la familia, resetear la subfamilia
+        if (field === 'familia') {
+          newForm = { ...newForm, subFamilia: '' };
+        }
+        
+        return { ...item, form: newForm };
+      }
+      return item;
+    }));
   };
 
   const handleImageChange = (formIndex: number, imageData: string | null) => {
@@ -636,7 +669,12 @@ export default function Formulario() {
 
   const validateForm = (form: any) => {
     const required = ['prioridad', 'centrocosto', 'sp', 'descripcion', 'cantidad', 'precio', 'umedida', 'moneda', 'motivo', 'familia', 'subFamilia'];
-    return required.every(field => form[field] && form[field].trim() !== '');
+    const isValid = required.every(field => {
+      const value = form[field];
+      return value && value.toString().trim() !== '';
+    });
+    
+    return isValid;
   };
 
   const getIncompleteFormIndex = () => {
@@ -669,12 +707,16 @@ export default function Formulario() {
           
           // Función auxiliar para enviar con delay
           const enviarConDelay = async (item: any, index: number) => {
+            // Asegurar que todos los campos requeridos tienen valores válidos
             const requestBody = { 
               ...item.form, 
-              usuarioId, 
-              imageData: item.imageData 
+              usuarioId,
+              imageData: item.imageData,
+              // Asegurar que los campos no estén vacíos
+              motivo: item.form.motivo || '',
+              familia: item.form.familia || '',
+              subFamilia: item.form.subFamilia || ''
             };
-            
             
             // Pequeño delay para evitar problemas de concurrencia
             if (index > 0) {
@@ -1315,7 +1357,7 @@ export default function Formulario() {
                           minWidth: '60px',
                           textAlign: 'center'
                         }}>
-                          #{solicitud.id}
+                          RQ{solicitud.id}
                         </div>
                         
                         <div style={{ flex: 1 }}>
@@ -1348,6 +1390,20 @@ export default function Formulario() {
                               </span>
                             </span>
                           </div>
+                          
+                          {/* Información de categorización si está disponible */}
+                          {(solicitud.familia || solicitud.subFamilia) && (
+                            <div style={{
+                              fontSize: '0.8rem',
+                              color: '#6b7280',
+                              marginTop: '0.25rem',
+                              fontStyle: 'italic'
+                            }}>
+                              {solicitud.familia && <span><strong>Familia:</strong> {solicitud.familia}</span>}
+                              {solicitud.familia && solicitud.subFamilia && <span> • </span>}
+                              {solicitud.subFamilia && <span><strong>Subfamilia:</strong> {solicitud.subFamilia}</span>}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1401,26 +1457,27 @@ export default function Formulario() {
                           </div>
                         </div>
                         
-                        {solicitud.ordenCompra && (
-                          <div>
-                            <div style={{
-                              fontSize: '0.75rem',
-                              color: '#6b7280',
-                              textTransform: 'uppercase',
-                              fontWeight: 600,
-                              marginBottom: '0.25rem'
-                            }}>
-                              Orden de Compra
-                            </div>
-                            <div style={{
-                              fontSize: '1rem',
-                              fontWeight: 600,
-                              color: '#3b82f6'
-                            }}>
-                              {solicitud.ordenCompra}
-                            </div>
+                        {/* Mostrar orden de compra o estado de asignación */}
+                        <div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: '#6b7280',
+                            textTransform: 'uppercase',
+                            fontWeight: 600,
+                            marginBottom: '0.25rem'
+                          }}>
+                            Orden de Compra
                           </div>
-                        )}
+                          <div style={{
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            color: solicitud.ordenCompra ? '#3b82f6' : 
+                                   solicitud.estado === 'Aprobado' ? '#f59e0b' : '#6b7280'
+                          }}>
+                            {solicitud.ordenCompra || 
+                             (solicitud.estado === 'Aprobado' ? 'Pendiente de asignación' : 'No asignado')}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
