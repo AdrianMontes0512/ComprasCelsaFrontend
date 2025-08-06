@@ -17,6 +17,8 @@ interface Solicitud {
   motivo: string;
   familia: string;
   subFamilia: string;
+  comentarios?: string;
+  fecha?: string;
 }
 
 const PAGE_SIZE = 14;
@@ -65,6 +67,11 @@ export default function ConfirmationTable() {
   const [editingCategorizacion, setEditingCategorizacion] = useState(false);
   const [tempFamilia, setTempFamilia] = useState('');
   const [tempSubFamilia, setTempSubFamilia] = useState('');
+
+  // Estados para edición de fecha y comentarios
+  const [editingFechaComentarios, setEditingFechaComentarios] = useState(false);
+  const [tempFecha, setTempFecha] = useState('');
+  const [tempComentarios, setTempComentarios] = useState('');
 
   useEffect(() => {
     const fetchSolicitudes = async () => {
@@ -183,6 +190,9 @@ export default function ConfirmationTable() {
     setTempFamilia(solicitud.familia || '');
     setTempSubFamilia(solicitud.subFamilia || '');
     setEditingCategorizacion(false);
+    setTempFecha(solicitud.fecha || '');
+    setTempComentarios(solicitud.comentarios || '');
+    setEditingFechaComentarios(false);
     setShowDetailModal(true);
   };
 
@@ -221,39 +231,114 @@ export default function ConfirmationTable() {
       });
 
       if (res.ok) {
-        const responseData = await res.json();
+        // Recargar los datos desde el servidor para obtener la información más actualizada
+        const fetchSolicitudes = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const data = await res.json();
+            setSolicitudes(data.content || []);
+            
+            // Actualizar también la solicitud seleccionada con los datos frescos del servidor
+            const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
+            if (solicitudActualizada) {
+              setSelectedSolicitud(solicitudActualizada);
+              setTempFamilia(solicitudActualizada.familia || '');
+              setTempSubFamilia(solicitudActualizada.subFamilia || '');
+            }
+          } catch (err) {
+            console.error('Error al recargar solicitudes:', err);
+          }
+        };
         
-        // Verificar si los datos realmente cambiaron en el servidor
-        const cambiosAplicados = responseData.familia === tempFamilia && responseData.subFamilia === tempSubFamilia;
+        // Ejecutar la recarga
+        await fetchSolicitudes();
         
-        if (cambiosAplicados) {
-          // Actualizar la solicitud en el estado local
-          setSolicitudes(prev => {
-            const updated = prev.map(s => 
-              s.id === selectedSolicitud.id 
-                ? { ...s, familia: tempFamilia, subFamilia: tempSubFamilia }
-                : s
-            );
-            return updated;
-          });
-          
-          // Actualizar selectedSolicitud también
-          setSelectedSolicitud(prev => {
-            const updated = prev ? { ...prev, familia: tempFamilia, subFamilia: tempSubFamilia } : null;
-            return updated;
-          });
-          
-          setEditingCategorizacion(false);
-          alert('✅ Categorización actualizada correctamente');
-        } else {
-          alert('⚠️ Warning: El servidor no aplicó los cambios. Puede ser un problema de persistencia en el backend.');
-        }
+        setEditingCategorizacion(false);
+        alert('✅ Categorización actualizada correctamente');
       } else {
         const errorText = await res.text();
         alert('❌ Error al actualizar la categorización: ' + errorText);
       }
     } catch (err) {
       alert('❌ Error de conexión al actualizar la categorización');
+    }
+  };
+
+  // Función para iniciar edición de fecha y comentarios
+  const iniciarEdicionFechaComentarios = () => {
+    setEditingFechaComentarios(true);
+  };
+
+  // Función para cancelar edición de fecha y comentarios
+  const cancelarEdicionFechaComentarios = () => {
+    if (selectedSolicitud) {
+      setTempFecha(selectedSolicitud.fecha || '');
+      setTempComentarios(selectedSolicitud.comentarios || '');
+    }
+    setEditingFechaComentarios(false);
+  };
+
+  // Función para guardar cambios de fecha y comentarios
+  const guardarFechaComentarios = async () => {
+    if (!selectedSolicitud) return;
+
+    const token = localStorage.getItem('token');
+    const body = { 
+      fecha: tempFecha,
+      comentarios: tempComentarios
+    };
+
+    try {
+      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        // Recargar los datos desde el servidor para obtener la información más actualizada
+        const fetchSolicitudes = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const data = await res.json();
+            setSolicitudes(data.content || []);
+            
+            // Actualizar también la solicitud seleccionada con los datos frescos del servidor
+            const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
+            if (solicitudActualizada) {
+              setSelectedSolicitud(solicitudActualizada);
+              setTempFecha(solicitudActualizada.fecha || '');
+              setTempComentarios(solicitudActualizada.comentarios || '');
+            }
+          } catch (err) {
+            console.error('Error al recargar solicitudes:', err);
+          }
+        };
+        
+        // Ejecutar la recarga
+        await fetchSolicitudes();
+        
+        setEditingFechaComentarios(false);
+        alert('✅ Fecha y comentarios actualizados correctamente');
+      } else {
+        const errorText = await res.text();
+        alert('❌ Error al actualizar fecha y comentarios: ' + errorText);
+      }
+    } catch (err) {
+      alert('❌ Error de conexión al actualizar fecha y comentarios');
     }
   };
 
@@ -1601,6 +1686,186 @@ export default function ConfirmationTable() {
                     border: '1px solid #bbf7d0'
                   }}>
                     {selectedSolicitud.ordenCompra}
+                  </div>
+                </div>
+              )}
+
+              {/* Fecha y Comentarios para solicitudes aprobadas */}
+              {selectedSolicitud.estado === 'Aprobado' && (
+                <div style={{
+                  background: '#f0f4ff',
+                  borderRadius: '10px',
+                  padding: '1rem',
+                  marginTop: '1rem',
+                  border: '1px solid #6366f1'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '0.75rem'
+                  }}>
+                    <h4 style={{
+                      margin: 0,
+                      color: '#3730a3',
+                      fontSize: '1rem',
+                      fontWeight: 600
+                    }}>
+                      📅 Fecha y Comentarios
+                    </h4>
+                    
+                    {!editingFechaComentarios ? (
+                      <button
+                        onClick={iniciarEdicionFechaComentarios}
+                        style={{
+                          background: '#6366f1',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseOver={e => {
+                          e.currentTarget.style.background = '#4f46e5';
+                        }}
+                        onMouseOut={e => {
+                          e.currentTarget.style.background = '#6366f1';
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                    ) : (
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={guardarFechaComentarios}
+                          style={{
+                            background: '#22c55e',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          ✅ Guardar
+                        </button>
+                        <button
+                          onClick={cancelarEdicionFechaComentarios}
+                          style={{
+                            background: '#ef4444',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          ❌ Cancelar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: '#3730a3',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                      marginBottom: '0.25rem'
+                    }}>
+                      Fecha
+                    </div>
+                    {!editingFechaComentarios ? (
+                      <div style={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#1e1b4b',
+                        padding: '0.5rem',
+                        background: '#fff',
+                        borderRadius: '6px',
+                        border: '1px solid #c7d2fe'
+                      }}>
+                        {selectedSolicitud.fecha ? (
+                          new Date(selectedSolicitud.fecha).toLocaleDateString('es-PE')
+                        ) : (
+                          'No especificada'
+                        )}
+                      </div>
+                    ) : (
+                      <input
+                        type="date"
+                        value={tempFecha}
+                        onChange={(e) => setTempFecha(e.target.value)}
+                        style={{
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          border: '2px solid #6366f1',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          width: '100%'
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: '#3730a3',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                      marginBottom: '0.25rem'
+                    }}>
+                      Comentarios
+                    </div>
+                    {!editingFechaComentarios ? (
+                      <div style={{
+                        fontSize: '1rem',
+                        color: '#1e1b4b',
+                        lineHeight: '1.5',
+                        padding: '0.75rem',
+                        background: '#fff',
+                        borderRadius: '6px',
+                        border: '1px solid #c7d2fe',
+                        minHeight: '60px',
+                        fontStyle: selectedSolicitud.comentarios ? 'normal' : 'italic'
+                      }}>
+                        {selectedSolicitud.comentarios || 'Sin comentarios'}
+                      </div>
+                    ) : (
+                      <textarea
+                        value={tempComentarios}
+                        onChange={(e) => setTempComentarios(e.target.value)}
+                        placeholder="Ingrese comentarios sobre la solicitud..."
+                        style={{
+                          padding: '0.75rem',
+                          borderRadius: '6px',
+                          border: '2px solid #6366f1',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          width: '100%',
+                          minHeight: '80px',
+                          resize: 'vertical',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
               )}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaExclamationCircle, FaBoxOpen, FaFileAlt, FaCalculator, FaDollarSign, FaRuler, FaMoneyBillWave, FaImage, FaPaperPlane, FaPlus, FaCogs, FaCheck, FaTimes, FaHistory, FaEye, FaBuilding } from 'react-icons/fa';
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
-const sps = ['Producto', 'Servicio'];
+const sps = ['Producto', 'Servicio','Activo'];
 const umedidas = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego'];
 const monedas = ['Dolares', 'Soles', 'Euros'];
 
@@ -477,7 +477,7 @@ function FormularioIndividual({
         
         <div style={{...formStyles.fieldGroup, flex: 1}}>
           <label style={formStyles.label}>
-            <FaRuler style={formStyles.icon} /> Unidad
+            <FaRuler style={formStyles.icon} /> Unidad de medida
           </label>
           <select
             name="umedida"
@@ -497,7 +497,7 @@ function FormularioIndividual({
       <div style={formStyles.fieldRow}>
         <div style={{...formStyles.fieldGroup, flex: 1}}>
           <label style={formStyles.label}>
-            <FaDollarSign style={formStyles.icon} /> Precio
+            <FaDollarSign style={formStyles.icon} /> Importe referencial
           </label>
           <input
             name="precio"
@@ -606,6 +606,10 @@ export default function Formulario() {
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotalPages, setHistoryTotalPages] = useState(1);
   const [historyTotalElements, setHistoryTotalElements] = useState(0);
+  
+  // Estados para el modal de detalles de solicitud
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedSolicitud, setSelectedSolicitud] = useState<any>(null);
 
   const MAX_FORMULARIOS = 10;
 
@@ -890,6 +894,12 @@ export default function Formulario() {
     } finally {
       setLoadingHistory(false);
     }
+  };
+
+  // Función para mostrar los detalles de una solicitud
+  const mostrarDetalleSolicitud = (solicitud: any) => {
+    setSelectedSolicitud(solicitud);
+    setShowDetailModal(true);
   };
 
   return (
@@ -1347,16 +1357,33 @@ export default function Formulario() {
                         marginBottom: '1rem',
                         paddingRight: '6rem'
                       }}>
-                        <div style={{
-                          background: '#f73317',
-                          color: '#fff',
-                          borderRadius: '8px',
-                          padding: '0.5rem',
-                          fontWeight: 600,
-                          fontSize: '0.9rem',
-                          minWidth: '60px',
-                          textAlign: 'center'
-                        }}>
+                        <div 
+                          onClick={() => mostrarDetalleSolicitud(solicitud)}
+                          style={{
+                            background: '#f73317',
+                            color: '#fff',
+                            borderRadius: '8px',
+                            padding: '0.5rem',
+                            fontWeight: 600,
+                            fontSize: '0.9rem',
+                            minWidth: '60px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            boxShadow: '0 2px 4px rgba(247, 51, 23, 0.3)'
+                          }}
+                          onMouseOver={e => {
+                            e.currentTarget.style.background = '#e02b0f';
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(247, 51, 23, 0.4)';
+                          }}
+                          onMouseOut={e => {
+                            e.currentTarget.style.background = '#f73317';
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(247, 51, 23, 0.3)';
+                          }}
+                          title="Hacer clic para ver detalles completos"
+                        >
                           RQ{solicitud.id}
                         </div>
                         
@@ -1573,6 +1600,338 @@ export default function Formulario() {
                   >
                     Siguiente →
                   </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Detalles de Solicitud */}
+      {showDetailModal && selectedSolicitud && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1100,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '20px',
+            padding: '2rem',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+            maxWidth: '800px',
+            width: '95%',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Header del modal */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '1.5rem',
+              paddingBottom: '1rem',
+              borderBottom: '2px solid #f1f5f9'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  background: '#f73317',
+                  color: '#fff',
+                  borderRadius: '12px',
+                  padding: '0.75rem',
+                  fontWeight: 700,
+                  fontSize: '1.1rem'
+                }}>
+                  RQ{selectedSolicitud.id}
+                </div>
+                <div>
+                  <h3 style={{
+                    color: '#1f2937',
+                    fontSize: '1.4rem',
+                    fontWeight: 700,
+                    margin: 0,
+                    marginBottom: '0.25rem'
+                  }}>
+                    Detalles de la Solicitud
+                  </h3>
+                  <span style={{
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: '#fff',
+                    backgroundColor: 
+                      selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' : 
+                      selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    {selectedSolicitud.estado}
+                  </span>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => setShowDetailModal(false)}
+                style={{
+                  background: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.5rem',
+                  cursor: 'pointer',
+                  color: '#6b7280',
+                  fontSize: '1.2rem',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.color = '#374151';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = '#f1f5f9';
+                  e.currentTarget.style.color = '#6b7280';
+                }}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Contenido del modal */}
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              paddingRight: '0.5rem'
+            }}>
+              {/* Información principal */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '2rem'
+              }}>
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '1.5rem',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 1rem 0',
+                    color: '#1f2937',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    borderBottom: '2px solid #e2e8f0',
+                    paddingBottom: '0.5rem'
+                  }}>
+                    Información General
+                  </h4>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Descripción:</span>
+                      <div style={{ color: '#1f2937', fontWeight: 500 }}>{selectedSolicitud.descripcion}</div>
+                    </div>
+                    
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Tipo:</span>
+                      <div style={{ color: '#1f2937', fontWeight: 500 }}>{selectedSolicitud.sp}</div>
+                    </div>
+                    
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Prioridad:</span>
+                      <div style={{
+                        color: selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' : 
+                               selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                        fontWeight: 600
+                      }}>
+                        {selectedSolicitud.prioridad}
+                      </div>
+                    </div>
+                    
+                    {selectedSolicitud.maquina && (
+                      <div>
+                        <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Máquina:</span>
+                        <div style={{ color: '#1f2937', fontWeight: 500 }}>{selectedSolicitud.maquina}</div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Motivo:</span>
+                      <div style={{ color: '#1f2937', fontWeight: 500 }}>{selectedSolicitud.motivo}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '1.5rem',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 1rem 0',
+                    color: '#1f2937',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    borderBottom: '2px solid #e2e8f0',
+                    paddingBottom: '0.5rem'
+                  }}>
+                    Especificaciones
+                  </h4>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Cantidad:</span>
+                      <div style={{ color: '#1f2937', fontWeight: 600, fontSize: '1.1rem' }}>
+                        {selectedSolicitud.cantidad} {selectedSolicitud.umedida}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Precio:</span>
+                      <div style={{ color: '#059669', fontWeight: 600, fontSize: '1.1rem' }}>
+                        {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', { 
+                          minimumFractionDigits: 2 
+                        })} {selectedSolicitud.moneda}
+                      </div>
+                    </div>
+                    
+                    {selectedSolicitud.familia && (
+                      <div>
+                        <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Familia:</span>
+                        <div style={{ color: '#1f2937', fontWeight: 500 }}>{selectedSolicitud.familia}</div>
+                      </div>
+                    )}
+                    
+                    {selectedSolicitud.subFamilia && (
+                      <div>
+                        <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Subfamilia:</span>
+                        <div style={{ color: '#1f2937', fontWeight: 500 }}>{selectedSolicitud.subFamilia}</div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.9rem' }}>Orden de Compra:</span>
+                      <div style={{
+                        color: selectedSolicitud.ordenCompra ? '#3b82f6' : '#6b7280',
+                        fontWeight: 500
+                      }}>
+                        {selectedSolicitud.ordenCompra || 'No asignado'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Información de aprobación para solicitudes aprobadas */}
+              {selectedSolicitud.estado === 'Aprobado' && (selectedSolicitud.fecha || selectedSolicitud.comentarios) && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%)',
+                  padding: '1.5rem',
+                  borderRadius: '12px',
+                  border: '2px solid #bbf7d0',
+                  marginBottom: '1rem'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    marginBottom: '1.5rem'
+                  }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: '#22c55e'
+                    }}></div>
+                    <h4 style={{
+                      margin: 0,
+                      color: '#166534',
+                      fontSize: '1.2rem',
+                      fontWeight: 700
+                    }}>
+                      Información de Compra
+                    </h4>
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: selectedSolicitud.fecha && selectedSolicitud.comentarios ? '1fr 1fr' : '1fr',
+                    gap: '1.5rem'
+                  }}>
+                    {selectedSolicitud.fecha && (
+                      <div>
+                        <div style={{
+                          fontSize: '0.85rem',
+                          color: '#166534',
+                          textTransform: 'uppercase',
+                          fontWeight: 600,
+                          marginBottom: '0.5rem',
+                          letterSpacing: '0.5px'
+                        }}>
+                          Fecha de Entrega
+                        </div>
+                        <div style={{
+                          fontWeight: 600,
+                          color: '#15803d',
+                          fontSize: '1rem',
+                          background: 'rgba(255, 255, 255, 0.7)',
+                          padding: '0.75rem',
+                          borderRadius: '8px',
+                          border: '1px solid #bbf7d0'
+                        }}>
+                          {selectedSolicitud.fecha}
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedSolicitud.comentarios && (
+                      <div>
+                        <div style={{
+                          fontSize: '0.85rem',
+                          color: '#166534',
+                          textTransform: 'uppercase',
+                          fontWeight: 600,
+                          marginBottom: '0.5rem',
+                          letterSpacing: '0.5px'
+                        }}>
+                          Comentario
+                        </div>
+                        <div style={{
+                          fontWeight: 500,
+                          color: '#15803d',
+                          fontSize: '1rem',
+                          lineHeight: '1.5',
+                          background: 'rgba(255, 255, 255, 0.7)',
+                          padding: '0.75rem',
+                          borderRadius: '8px',
+                          border: '1px solid #bbf7d0',
+                          maxHeight: '150px',
+                          overflow: 'auto'
+                        }}>
+                          {selectedSolicitud.comentarios}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
