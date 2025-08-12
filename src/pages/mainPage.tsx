@@ -6,10 +6,12 @@ import logo from '../assets/logo.jpg'; // Importa el logo
 import Formulario from '../utilities/Formulario';
 import Confirmation from '../utilities/confirmation';
 import Jefes from '../utilities/Jefes'; // Asegúrate de importar el componente
+import LoadingScreen from '../utilities/LoadingScreen';
 
 export default function MainPage() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const firstName = localStorage.getItem('firstname') || '';
   const lastName = localStorage.getItem('lastname') || '';
@@ -18,8 +20,14 @@ export default function MainPage() {
   const userRole = localStorage.getItem('role') || '';
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate('/');
+    setIsLoggingOut(true);
+    setIsDropdownOpen(false); // Cerrar el dropdown
+    
+    // Pequeña pausa para mostrar la animación antes de limpiar y navegar
+    setTimeout(() => {
+      localStorage.clear();
+      navigate('/');
+    }, 1500); // 1.5 segundos de animación
   };
 
   // Cerrar dropdown cuando se hace clic fuera
@@ -308,6 +316,11 @@ export default function MainPage() {
           }
         `}
       </style>
+
+      {/* Pantalla de carga para logout */}
+      {isLoggingOut && (
+        <LoadingScreen message="Cerrando sesión..." />
+      )}
     </div>
   );
 }
