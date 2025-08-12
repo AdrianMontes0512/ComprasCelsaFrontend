@@ -19,21 +19,37 @@ interface Solicitud {
   subFamilia: string;
   comentarios?: string;
   fecha?: string;
+  maquina?: string;
 }
 
 const PAGE_SIZE = 14;
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
 const tipos = ['Producto', 'Servicio'];
-const estados = ['Pendiente', 'Aprobado', 'Rechazado']; 
+const estados = ['Pendiente', 'Aprobado', 'Rechazado'];
+const monedas = ['Dolares', 'Soles', 'Euros'];
+const unidades = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego']; 
 
 const familiasYSubfamilias = {
-  'Repuesto': ['Accesorios', 'Bunchadora', 'Compresoras', 'Extrusoras', 'Fajas', 'Montacargas', 'Rep. Electricos', 'Rep. Neumaticos', 'Retenes y O-Ring', 'Rodamientos', 'Trefiladores'],
-  'Herramientas': ['Herramientas / Produccion', 'Herramientas de Cableado', 'Herramientas de Extrusion', 'Herramientas de medicion', 'Herramientas Mecanicos / Electrico', 'Herramientas Metradoras y Cortad', 'Hileras de Cableado', 'Hileras de Trefilacion', 'Maquinaria y Equipos'],
-  'Servicio de Maestranza': ['Servicio Calibracion', 'Servicio de Inspeccion', 'Servicio Mantenimiento de Montac', 'Servicio Tecnico', 'Servicios de Ingenieria', 'Servicios de Maestranza', 'Servicios Electricos', 'Servicios Mecanicos'],
-  'Servicios': ['Servicios Generales'],
-  'Suministros': ['Suministros de planta', 'BANDEJA DE METAL 3 PISOS ES', 'CARRITO PORTA BALONES DE', 'Combustibles y Lubricantes', 'DISPENSADOR DE ZUNCHO ME', 'Mercaderias', 'Suministros de Imprenta', 'Suministros de Limpieza', 'Suministros de Mantenimiento', 'Suministros de Oficina', 'Suministros de Planta', 'Suministros Electricos', 'Suministros Gasfiteria', 'Uniformes Equipos de Seguridad'],
-  'Suministros de oficina': ['Mobiliario Oficina', 'SERVICIO DE CUENTAS DE COR', 'Suministros de computo', 'Suministros de Oficina']
+  'Materias primas': ['Cobre y metales', 'Plásticos y polímeros', 'Aislantes y recubrimientos', 'Pantallas y blindajes', 'Rellenos y separadores', 'Material conductor', 'Chaquetas y cubiertas', 'Componentes eléctricos', 'Aditivos y auxiliares'],
+  'Mantenimiento': ['Equipos industriales', 'Repuestos y partes', 'Ferretería y herramientas', 'Electricidad industrial', 'Neumática e hidráulica', 'Lubricantes y químicos', 'Elementos de fijación', 'Alquileres de equipos industriales', 'Servicios eléctricos', 'Servicios mecánicos', 'Servicios neumáticos', 'Servicios hidráulicos', 'Mantenimiento preventivo', 'Mantenimiento correctivo', 'Mantenimiento predictivo', 'Servicios integrales por contrato', 'Calibraciones y normativas', 'Servicios técnicos TI'],
+  'Fabricación': ['Mecanizado y CNC', 'Corte y plegado', 'Soldadura', 'Componentes metálicos', 'Tratamientos', 'Plásticos técnicos', 'Moldes y matrices'],
+  'Ingeniería': ['Proyectos industriales', 'Ingeniería civil', 'Ingeniería eléctrica', 'Ingeniería mecánica', 'Procesos industriales', 'Automatización y control', 'Consultorías técnicas', 'Capacitación técnica'],
+  'SSOMA': ['EPP y ropa de trabajo', 'Salud ocupacional', 'Capacitación en seguridad'],
+  'Facility': ['Alimentación', 'Limpieza y jardinería', 'Transporte interno', 'Seguridad física', 'Mantenimiento edilicio', 'Servicios auxiliares', 'Servicios de alimentación', 'Limpieza y áreas verdes', 'Apoyo logístico interno', 'Utensilios de cocina y comedor', 'Equipos menores de cocina', 'Suministros de alimentos y bebidas', 'Dispensadores y accesorios', 'Limpieza de kitchenette'],
+  'TI': ['Software y licencias', 'Servicios tecnológicos', 'Equipos de cómputo', 'Periféricos de computación', 'Equipos móviles', 'Accesorios tecnológicos', 'Componentes y repuestos TI'],
+  'Marketing': ['Material promocional', 'Eventos y ferias', 'Publicidad y medios'],
+  'Administración': ['Oficina', 'Útiles de oficina', 'Equipos de oficina', 'Servicios de impresión y copiado', 'Mobiliario', 'Traducción y papelería institucional', 'Producción editorial o gráfica'],
+  'Legal': ['Asesoría legal', 'Trámites y permisos', 'Certificaciones y normas'],
+  'Recursos Humanos': ['Selección y reclutamiento', 'Beneficios y compensaciones', 'Bienestar y clima laboral', 'Capacitación y desarrollo', 'Evaluación de desempeño', 'Tercerización de personal'],
+  'Logística y Transporte': ['Transporte local', 'Transporte internacional', 'Agenciamiento aduanal', 'Gastos portuarios', 'Seguros de carga', 'Logística tercerizada', 'Fletes y maniobras', 'Equipos y accesorios logísticos', 'Identificación y marcaje', 'Embalajes y bobinas', 'Zunchado y protección final', 'Paletizado y despacho'],
+  'Proyectos': ['Consultoría de proyectos'],
+  'Finanzas y contabilidad': ['Servicios contables y tributarios', 'Seguros'],
+  'Legal y cumplimiento': ['Compliance y ética'],
+  'Gestión documental': ['Digitalización y archivo'],
+  'Sostenibilidad': ['Gestión ambiental', 'Gestión de residuos'],
+  'Activos industriales': ['Equipos de proceso', 'Equipos auxiliares de planta', 'Equipos móviles industriales', 'Sistemas de energía y control'],
+  'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos']
 }; 
 
 export default function ConfirmationTable() {
@@ -72,6 +88,17 @@ export default function ConfirmationTable() {
   const [editingFechaComentarios, setEditingFechaComentarios] = useState(false);
   const [tempFecha, setTempFecha] = useState('');
   const [tempComentarios, setTempComentarios] = useState('');
+
+  // Estados para edición de máquina
+  const [editingMaquina, setEditingMaquina] = useState(false);
+  const [tempMaquina, setTempMaquina] = useState('');
+
+  // Estados para edición de información comercial
+  const [editingComercial, setEditingComercial] = useState(false);
+  const [tempCantidad, setTempCantidad] = useState('');
+  const [tempPrecio, setTempPrecio] = useState('');
+  const [tempUnidad, setTempUnidad] = useState('');
+  const [tempMoneda, setTempMoneda] = useState('');
 
   useEffect(() => {
     const fetchSolicitudes = async () => {
@@ -193,6 +220,13 @@ export default function ConfirmationTable() {
     setTempFecha(solicitud.fecha || '');
     setTempComentarios(solicitud.comentarios || '');
     setEditingFechaComentarios(false);
+    setTempMaquina(solicitud.maquina || '');
+    setEditingMaquina(false);
+    setTempCantidad(solicitud.cantidad || '');
+    setTempPrecio(solicitud.precio || '');
+    setTempUnidad(solicitud.umedida || '');
+    setTempMoneda(solicitud.moneda || '');
+    setEditingComercial(false);
     setShowDetailModal(true);
   };
 
@@ -339,6 +373,151 @@ export default function ConfirmationTable() {
       }
     } catch (err) {
       alert('❌ Error de conexión al actualizar fecha y comentarios');
+    }
+  };
+
+  // Funciones para edición de máquina
+  const iniciarEdicionMaquina = () => {
+    setEditingMaquina(true);
+  };
+
+  const cancelarEdicionMaquina = () => {
+    if (selectedSolicitud) {
+      setTempMaquina(selectedSolicitud.maquina || '');
+    }
+    setEditingMaquina(false);
+  };
+
+  const guardarMaquina = async () => {
+    if (!selectedSolicitud) return;
+
+    const token = localStorage.getItem('token');
+    const body = { 
+      maquina: tempMaquina
+    };
+
+    try {
+      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        // Recargar los datos desde el servidor para obtener la información más actualizada
+        const fetchSolicitudes = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const data = await res.json();
+            setSolicitudes(data.content || []);
+            
+            // Actualizar también la solicitud seleccionada con los datos frescos del servidor
+            const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
+            if (solicitudActualizada) {
+              setSelectedSolicitud(solicitudActualizada);
+              setTempMaquina(solicitudActualizada.maquina || '');
+            }
+          } catch (err) {
+            console.error('Error al recargar solicitudes:', err);
+          }
+        };
+        
+        // Ejecutar la recarga
+        await fetchSolicitudes();
+        
+        setEditingMaquina(false);
+        alert('✅ Máquina actualizada correctamente');
+      } else {
+        const errorText = await res.text();
+        alert('❌ Error al actualizar la máquina: ' + errorText);
+      }
+    } catch (err) {
+      alert('❌ Error de conexión al actualizar la máquina');
+    }
+  };
+
+  // Funciones para edición de información comercial
+  const iniciarEdicionComercial = () => {
+    setEditingComercial(true);
+  };
+
+  const cancelarEdicionComercial = () => {
+    if (selectedSolicitud) {
+      setTempCantidad(selectedSolicitud.cantidad || '');
+      setTempPrecio(selectedSolicitud.precio || '');
+      setTempUnidad(selectedSolicitud.umedida || '');
+      setTempMoneda(selectedSolicitud.moneda || '');
+    }
+    setEditingComercial(false);
+  };
+
+  const guardarComercial = async () => {
+    if (!selectedSolicitud) return;
+
+    const token = localStorage.getItem('token');
+    const body = { 
+      cantidad: tempCantidad,
+      precio: tempPrecio,
+      umedida: tempUnidad,
+      moneda: tempMoneda
+    };
+
+    try {
+      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        // Recargar los datos desde el servidor para obtener la información más actualizada
+        const fetchSolicitudes = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const data = await res.json();
+            setSolicitudes(data.content || []);
+            
+            // Actualizar también la solicitud seleccionada con los datos frescos del servidor
+            const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
+            if (solicitudActualizada) {
+              setSelectedSolicitud(solicitudActualizada);
+              setTempCantidad(solicitudActualizada.cantidad || '');
+              setTempPrecio(solicitudActualizada.precio || '');
+              setTempUnidad(solicitudActualizada.umedida || '');
+              setTempMoneda(solicitudActualizada.moneda || '');
+            }
+          } catch (err) {
+            console.error('Error al recargar solicitudes:', err);
+          }
+        };
+        
+        // Ejecutar la recarga
+        await fetchSolicitudes();
+        
+        setEditingComercial(false);
+        alert('✅ Información comercial actualizada correctamente');
+      } else {
+        const errorText = await res.text();
+        alert('❌ Error al actualizar la información comercial: ' + errorText);
+      }
+    } catch (err) {
+      alert('❌ Error de conexión al actualizar la información comercial');
     }
   };
 
@@ -1549,6 +1728,140 @@ export default function ConfirmationTable() {
                 </div>
               </div>
 
+              {/* Información de máquina */}
+              <div style={{
+                background: '#f0fdf4',
+                borderRadius: '10px',
+                padding: '1rem',
+                marginBottom: '1rem',
+                border: '1px solid #22c55e'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.75rem'
+                }}>
+                  <h4 style={{
+                    margin: 0,
+                    color: '#166534',
+                    fontSize: '1rem',
+                    fontWeight: 600
+                  }}>
+                    🔧 Máquina
+                  </h4>
+                  
+                  {!editingMaquina ? (
+                    <button
+                      onClick={iniciarEdicionMaquina}
+                      style={{
+                        background: '#22c55e',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={e => {
+                        e.currentTarget.style.background = '#16a34a';
+                      }}
+                      onMouseOut={e => {
+                        e.currentTarget.style.background = '#22c55e';
+                      }}
+                    >
+                      ✏️ Editar
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={guardarMaquina}
+                        style={{
+                          background: '#22c55e',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        ✅ Guardar
+                      </button>
+                      <button
+                        onClick={cancelarEdicionMaquina}
+                        style={{
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        ❌ Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: '#166534',
+                    textTransform: 'uppercase',
+                    fontWeight: 600,
+                    marginBottom: '0.25rem'
+                  }}>
+                    Máquina Asignada
+                  </div>
+                  {!editingMaquina ? (
+                    <div style={{
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      color: '#15803d',
+                      fontStyle: selectedSolicitud.maquina ? 'normal' : 'italic'
+                    }}>
+                      {selectedSolicitud.maquina || 'No especificado'}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      value={tempMaquina}
+                      onChange={e => setTempMaquina(e.target.value)}
+                      placeholder="Ingrese el nombre de la máquina"
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        borderRadius: '6px',
+                        border: '1px solid #d1d5db',
+                        fontSize: '1rem',
+                        fontWeight: 500,
+                        backgroundColor: '#fff',
+                        color: '#374151',
+                        outline: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#22c55e';
+                        e.target.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.1)';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#d1d5db';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+
               {/* Información comercial */}
               <div style={{
                 background: '#f0f9ff',
@@ -1557,14 +1870,81 @@ export default function ConfirmationTable() {
                 marginBottom: '1rem',
                 border: '1px solid #0ea5e9'
               }}>
-                <h4 style={{
-                  margin: '0 0 0.75rem 0',
-                  color: '#0c4a6e',
-                  fontSize: '1rem',
-                  fontWeight: 600
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.75rem'
                 }}>
-                  💰 Información Comercial
-                </h4>
+                  <h4 style={{
+                    margin: 0,
+                    color: '#0c4a6e',
+                    fontSize: '1rem',
+                    fontWeight: 600
+                  }}>
+                    💰 Información Comercial
+                  </h4>
+                  
+                  {!editingComercial ? (
+                    <button
+                      onClick={iniciarEdicionComercial}
+                      style={{
+                        background: '#0ea5e9',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={e => {
+                        e.currentTarget.style.background = '#0284c7';
+                      }}
+                      onMouseOut={e => {
+                        e.currentTarget.style.background = '#0ea5e9';
+                      }}
+                    >
+                      ✏️ Editar
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={guardarComercial}
+                        style={{
+                          background: '#22c55e',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        ✅ Guardar
+                      </button>
+                      <button
+                        onClick={cancelarEdicionComercial}
+                        style={{
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        ❌ Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
                 
                 <div style={{
                   display: 'grid',
@@ -1581,13 +1961,43 @@ export default function ConfirmationTable() {
                     }}>
                       Cantidad
                     </div>
-                    <div style={{
-                      fontSize: '1.2rem',
-                      fontWeight: 700,
-                      color: '#059669'
-                    }}>
-                      {selectedSolicitud.cantidad}
-                    </div>
+                    {!editingComercial ? (
+                      <div style={{
+                        fontSize: '1.2rem',
+                        fontWeight: 700,
+                        color: '#059669'
+                      }}>
+                        {selectedSolicitud.cantidad}
+                      </div>
+                    ) : (
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={tempCantidad}
+                        onChange={e => setTempCantidad(e.target.value)}
+                        placeholder="0.00"
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          border: '1px solid #d1d5db',
+                          fontSize: '1rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onFocus={e => {
+                          e.target.style.borderColor = '#0ea5e9';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
+                        }}
+                        onBlur={e => {
+                          e.target.style.borderColor = '#d1d5db';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    )}
                   </div>
                   
                   <div>
@@ -1600,13 +2010,45 @@ export default function ConfirmationTable() {
                     }}>
                       Unidad
                     </div>
-                    <div style={{
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      color: '#0369a1'
-                    }}>
-                      {selectedSolicitud.umedida}
-                    </div>
+                    {!editingComercial ? (
+                      <div style={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#0369a1'
+                      }}>
+                        {selectedSolicitud.umedida}
+                      </div>
+                    ) : (
+                      <select
+                        value={tempUnidad}
+                        onChange={e => setTempUnidad(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          border: '1px solid #d1d5db',
+                          fontSize: '1rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onFocus={e => {
+                          e.target.style.borderColor = '#0ea5e9';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
+                        }}
+                        onBlur={e => {
+                          e.target.style.borderColor = '#d1d5db';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      >
+                        <option value="">Seleccionar unidad</option>
+                        {unidades.map(unidad => (
+                          <option key={unidad} value={unidad}>{unidad}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   
                   <div>
@@ -1619,13 +2061,45 @@ export default function ConfirmationTable() {
                     }}>
                       Moneda
                     </div>
-                    <div style={{
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      color: '#0369a1'
-                    }}>
-                      {selectedSolicitud.moneda}
-                    </div>
+                    {!editingComercial ? (
+                      <div style={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#0369a1'
+                      }}>
+                        {selectedSolicitud.moneda}
+                      </div>
+                    ) : (
+                      <select
+                        value={tempMoneda}
+                        onChange={e => setTempMoneda(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          border: '1px solid #d1d5db',
+                          fontSize: '1rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onFocus={e => {
+                          e.target.style.borderColor = '#0ea5e9';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
+                        }}
+                        onBlur={e => {
+                          e.target.style.borderColor = '#d1d5db';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      >
+                        <option value="">Seleccionar moneda</option>
+                        {monedas.map(moneda => (
+                          <option key={moneda} value={moneda}>{moneda}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 </div>
                 
@@ -1642,19 +2116,50 @@ export default function ConfirmationTable() {
                     color: '#0c4a6e',
                     textTransform: 'uppercase',
                     fontWeight: 600,
-                    marginBottom: '0.5rem'
+                    marginBottom: '0.25rem'
                   }}>
                     Precio Total
                   </div>
-                  <div style={{
-                    fontSize: '2rem',
-                    fontWeight: 700,
-                    color: '#059669'
-                  }}>
-                    {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', { 
-                      minimumFractionDigits: 2 
-                    })} {selectedSolicitud.moneda}
-                  </div>
+                  {!editingComercial ? (
+                    <div style={{
+                      fontSize: '2rem',
+                      fontWeight: 700,
+                      color: '#059669'
+                    }}>
+                      {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', { 
+                        minimumFractionDigits: 2 
+                      })} {selectedSolicitud.moneda}
+                    </div>
+                  ) : (
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={tempPrecio}
+                      onChange={e => setTempPrecio(e.target.value)}
+                      placeholder="0.00"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        borderRadius: '6px',
+                        border: '1px solid #d1d5db',
+                        fontSize: '1.5rem',
+                        fontWeight: 600,
+                        backgroundColor: '#fff',
+                        color: '#374151',
+                        outline: 'none',
+                        transition: 'all 0.2s ease',
+                        textAlign: 'center'
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#0ea5e9';
+                        e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#d1d5db';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  )}
                 </div>
               </div>
 

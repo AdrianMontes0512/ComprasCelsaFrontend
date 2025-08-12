@@ -7,13 +7,26 @@ const umedidas = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego'];
 const monedas = ['Dolares', 'Soles', 'Euros'];
 
 const familiasYSubfamilias = {
-  'Repuesto': ['Accesorios', 'Bunchadora', 'Compresoras', 'Extrusoras', 'Fajas', 'Montacargas', 'Rep. Electricos', 'Rep. Neumaticos', 'Retenes y O-Ring', 'Rodamientos', 'Trefiladores'],
-  'Herramientas': ['Herramientas / Produccion', 'Herramientas de Cableado', 'Herramientas de Extrusion', 'Herramientas de medicion', 'Herramientas Mecanicos / Electrico', 'Herramientas Metradoras y Cortad', 'Hileras de Cableado', 'Hileras de Trefilacion', 'Maquinaria y Equipos'],
-  'Servicio de Maestranza': ['Servicio Calibracion', 'Servicio de Inspeccion', 'Servicio Mantenimiento de Montac', 'Servicio Tecnico', 'Servicios de Ingenieria', 'Servicios de Maestranza', 'Servicios Electricos', 'Servicios Mecanicos'],
-  'Servicios': ['Servicios Generales'],
-  'Suministros': ['Suministros de planta', 'BANDEJA DE METAL 3 PISOS ES', 'CARRITO PORTA BALONES DE', 'Combustibles y Lubricantes', 'DISPENSADOR DE ZUNCHO ME', 'Mercaderias', 'Suministros de Imprenta', 'Suministros de Limpieza', 'Suministros de Mantenimiento', 'Suministros de Oficina', 'Suministros de Planta', 'Suministros Electricos', 'Suministros Gasfiteria', 'Uniformes Equipos de Seguridad'],
-  'Suministros de oficina': ['Mobiliario Oficina', 'SERVICIO DE CUENTAS DE COR', 'Suministros de computo', 'Suministros de Oficina']
-};
+  'Materias primas': ['Cobre y metales', 'Plásticos y polímeros', 'Aislantes y recubrimientos', 'Pantallas y blindajes', 'Rellenos y separadores', 'Material conductor', 'Chaquetas y cubiertas', 'Componentes eléctricos', 'Aditivos y auxiliares'],
+  'Mantenimiento': ['Equipos industriales', 'Repuestos y partes', 'Ferretería y herramientas', 'Electricidad industrial', 'Neumática e hidráulica', 'Lubricantes y químicos', 'Elementos de fijación', 'Alquileres de equipos industriales', 'Servicios eléctricos', 'Servicios mecánicos', 'Servicios neumáticos', 'Servicios hidráulicos', 'Mantenimiento preventivo', 'Mantenimiento correctivo', 'Mantenimiento predictivo', 'Servicios integrales por contrato', 'Calibraciones y normativas', 'Servicios técnicos TI'],
+  'Fabricación': ['Mecanizado y CNC', 'Corte y plegado', 'Soldadura', 'Componentes metálicos', 'Tratamientos', 'Plásticos técnicos', 'Moldes y matrices'],
+  'Ingeniería': ['Proyectos industriales', 'Ingeniería civil', 'Ingeniería eléctrica', 'Ingeniería mecánica', 'Procesos industriales', 'Automatización y control', 'Consultorías técnicas', 'Capacitación técnica'],
+  'SSOMA': ['EPP y ropa de trabajo', 'Salud ocupacional', 'Capacitación en seguridad'],
+  'Facility': ['Alimentación', 'Limpieza y jardinería', 'Transporte interno', 'Seguridad física', 'Mantenimiento edilicio', 'Servicios auxiliares', 'Servicios de alimentación', 'Limpieza y áreas verdes', 'Apoyo logístico interno', 'Utensilios de cocina y comedor', 'Equipos menores de cocina', 'Suministros de alimentos y bebidas', 'Dispensadores y accesorios', 'Limpieza de kitchenette'],
+  'TI': ['Software y licencias', 'Servicios tecnológicos', 'Equipos de cómputo', 'Periféricos de computación', 'Equipos móviles', 'Accesorios tecnológicos', 'Componentes y repuestos TI'],
+  'Marketing': ['Material promocional', 'Eventos y ferias', 'Publicidad y medios'],
+  'Administración': ['Oficina', 'Útiles de oficina', 'Equipos de oficina', 'Servicios de impresión y copiado', 'Mobiliario', 'Traducción y papelería institucional', 'Producción editorial o gráfica'],
+  'Legal': ['Asesoría legal', 'Trámites y permisos', 'Certificaciones y normas'],
+  'Recursos Humanos': ['Selección y reclutamiento', 'Beneficios y compensaciones', 'Bienestar y clima laboral', 'Capacitación y desarrollo', 'Evaluación de desempeño', 'Tercerización de personal'],
+  'Logística y Transporte': ['Transporte local', 'Transporte internacional', 'Agenciamiento aduanal', 'Gastos portuarios', 'Seguros de carga', 'Logística tercerizada', 'Fletes y maniobras', 'Equipos y accesorios logísticos', 'Identificación y marcaje', 'Embalajes y bobinas', 'Zunchado y protección final', 'Paletizado y despacho'],
+  'Proyectos': ['Consultoría de proyectos'],
+  'Finanzas y contabilidad': ['Servicios contables y tributarios', 'Seguros'],
+  'Legal y cumplimiento': ['Compliance y ética'],
+  'Gestión documental': ['Digitalización y archivo'],
+  'Sostenibilidad': ['Gestión ambiental', 'Gestión de residuos'],
+  'Activos industriales': ['Equipos de proceso', 'Equipos auxiliares de planta', 'Equipos móviles industriales', 'Sistemas de energía y control'],
+  'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos']
+}; 
 
 const familias = Object.keys(familiasYSubfamilias);
 
