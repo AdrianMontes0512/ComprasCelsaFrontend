@@ -49,7 +49,8 @@ const familiasYSubfamilias = {
   'Gestión documental': ['Digitalización y archivo'],
   'Sostenibilidad': ['Gestión ambiental', 'Gestión de residuos'],
   'Activos industriales': ['Equipos de proceso', 'Equipos auxiliares de planta', 'Equipos móviles industriales', 'Sistemas de energía y control'],
-  'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos']
+  'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos'],
+  'Mercadería': ['Cables aac', 'Alambres trolley', 'otros']
 }; 
 
 export default function ConfirmationTable() {
@@ -105,7 +106,7 @@ export default function ConfirmationTable() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+        const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -150,7 +151,7 @@ export default function ConfirmationTable() {
       Estado: s.estado,
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
       Usuario: usuarios[s.usuarioId] || 'Desconocido',
-      // Imagen: `http://localhost:8080/solicitudes/imagen/${s.id}`, // <-- Quitado del Excel
+      // Imagen: `http://192.168.0.113:8080/solicitudes/imagen/${s.id}`, // <-- Quitado del Excel
     }));
 
     const ws = XLSX.utils.json_to_sheet(dataToExport);
@@ -170,7 +171,7 @@ export default function ConfirmationTable() {
       await Promise.all(ids.map(async (id) => {
         if (!nuevos[id]) {
           try {
-            const res = await fetch(`http://localhost:8080/user/${id}`, {
+            const res = await fetch(`http://192.168.0.113:8080/user/${id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -190,7 +191,7 @@ export default function ConfirmationTable() {
   const descargarImagen = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/imagen/${id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/imagen/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -255,7 +256,7 @@ export default function ConfirmationTable() {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/${selectedSolicitud.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -269,7 +270,7 @@ export default function ConfirmationTable() {
         const fetchSolicitudes = async () => {
           try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+            const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -328,7 +329,7 @@ export default function ConfirmationTable() {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/${selectedSolicitud.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -342,7 +343,7 @@ export default function ConfirmationTable() {
         const fetchSolicitudes = async () => {
           try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+            const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -397,7 +398,7 @@ export default function ConfirmationTable() {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/${selectedSolicitud.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -411,7 +412,7 @@ export default function ConfirmationTable() {
         const fetchSolicitudes = async () => {
           try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+            const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -471,7 +472,7 @@ export default function ConfirmationTable() {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/solicitudes/${selectedSolicitud.id}`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/${selectedSolicitud.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -485,7 +486,7 @@ export default function ConfirmationTable() {
         const fetchSolicitudes = async () => {
           try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+            const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -729,7 +730,7 @@ export default function ConfirmationTable() {
                 <th style={thStyle}>📦 Tipo</th>
                 <th style={thStyle}>📝 Descripción</th>
                 <th style={thStyle}>🔢 Cantidad</th>
-                <th style={thStyle}>💰 Precio</th>
+                <th style={thStyle}>💰 Importe Referencial</th>
                 <th style={thStyle}>📏 Unidad</th>
                 <th style={thStyle}>Moneda</th>
                 <th style={thStyle}>📊 Estado</th>
@@ -887,10 +888,14 @@ export default function ConfirmationTable() {
                                 valorOriginal: valorOriginal,
                                 inputRef: inputRef,
                                 onConfirm: async () => {
+                                  
                                   const token = localStorage.getItem('token');
+                                  
                                   const body = { ordenCompra: nuevoValor };
+                                  
                                   try {
-                                    const res = await fetch(`http://localhost:8080/solicitudes/${s.id}`, {
+                                    
+                                    const res = await fetch(`http://192.168.0.113:8080/solicitudes/${s.id}`, {
                                       method: 'PATCH',
                                       headers: {
                                         'Content-Type': 'application/json',
@@ -898,22 +903,44 @@ export default function ConfirmationTable() {
                                       },
                                       body: JSON.stringify(body),
                                     });
+                                    
+
+                                    
                                     if (res.ok) {
-                                      setSolicitudes((prev) =>
-                                        prev.map((sol) =>
-                                          sol.id === s.id ? { ...sol, ordenCompra: nuevoValor } : sol
-                                        )
-                                      );
+                                      
+                                      // Recargar los datos desde el servidor para obtener la información más actualizada
+                                      const fetchSolicitudes = async () => {
+                                        try {
+                                          const token = localStorage.getItem('token');
+                                          const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+                                            headers: {
+                                              Authorization: `Bearer ${token}`,
+                                            },
+                                          });
+                                          const data = await res.json();
+                                          setSolicitudes(data.content || []);
+                                        } catch (err) {
+                                          console.error('Error al recargar solicitudes:', err);
+                                        }
+                                      };
+                                      
+                                      // Ejecutar la recarga
+                                      await fetchSolicitudes();
+                                      
                                     } else {
                                       const errorText = await res.text();
+                                      console.error('❌ Error en response:', errorText);
+                                      console.error('❌ Status code:', res.status);
                                       alert('❌ Error al actualizar orden de compra: ' + errorText);
                                     }
                                   } catch (err) {
+                                    console.error('❌ Error de conexión:', err);
                                     alert('❌ Error de conexión');
                                   }
                                   setShowOrdenModal(false);
                                   setModalOrdenData(null);
-                                },                              onCancel: () => {
+                                },
+                                onCancel: () => {
                                 // Revertir el input al valor original usando la referencia guardada
                                 inputRef.value = valorOriginal;
                                 setShowOrdenModal(false);
@@ -943,10 +970,14 @@ export default function ConfirmationTable() {
                               valorOriginal: valorOriginal,
                               inputRef: inputRef,
                               onConfirm: async () => {
+                                
                                 const token = localStorage.getItem('token');
+                                
                                 const body = { ordenCompra: nuevoValor };
+                                
                                 try {
-                                  const res = await fetch(`http://localhost:8080/solicitudes/${s.id}`, {
+                                  
+                                  const res = await fetch(`http://192.168.0.113:8080/solicitudes/${s.id}`, {
                                     method: 'PATCH',
                                     headers: {
                                       'Content-Type': 'application/json',
@@ -954,17 +985,38 @@ export default function ConfirmationTable() {
                                     },
                                     body: JSON.stringify(body),
                                   });
+                                  
+
+                                  
                                   if (res.ok) {
-                                    setSolicitudes((prev) =>
-                                      prev.map((sol) =>
-                                        sol.id === s.id ? { ...sol, ordenCompra: nuevoValor } : sol
-                                      )
-                                    );
+                                    
+                                    // Recargar los datos desde el servidor para obtener la información más actualizada
+                                    const fetchSolicitudes = async () => {
+                                      try {
+                                        const token = localStorage.getItem('token');
+                                        const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+                                          headers: {
+                                            Authorization: `Bearer ${token}`,
+                                          },
+                                        });
+                                        const data = await res.json();
+                                        setSolicitudes(data.content || []);
+                                      } catch (err) {
+                                        console.error('Error al recargar solicitudes:', err);
+                                      }
+                                    };
+                                    
+                                    // Ejecutar la recarga
+                                    await fetchSolicitudes();
+                                    
                                   } else {
                                     const errorText = await res.text();
+                                    console.error('❌ Error en response:', errorText);
+                                    console.error('❌ Status code:', res.status);
                                     alert('❌ Error al actualizar orden de compra: ' + errorText);
                                   }
                                 } catch (err) {
+                                  console.error('❌ Error de conexión:', err);
                                   alert('❌ Error de conexión');
                                 }
                                 setShowOrdenModal(false);

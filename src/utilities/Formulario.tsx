@@ -25,7 +25,8 @@ const familiasYSubfamilias = {
   'Gestión documental': ['Digitalización y archivo'],
   'Sostenibilidad': ['Gestión ambiental', 'Gestión de residuos'],
   'Activos industriales': ['Equipos de proceso', 'Equipos auxiliares de planta', 'Equipos móviles industriales', 'Sistemas de energía y control'],
-  'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos']
+  'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos'],
+  'Mercadería': ['Cables aac', 'Alambres trolley', 'otros']
 }; 
 
 const familias = Object.keys(familiasYSubfamilias);
@@ -88,7 +89,7 @@ function FormularioIndividual({
       setLoadingAreas(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/areas/all', {
+        const response = await fetch('http://192.168.0.113:8080/areas/all', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -740,7 +741,7 @@ export default function Formulario() {
               await new Promise(resolve => setTimeout(resolve, 200));
             }
             
-            return fetch('http://localhost:8080/solicitudes', {
+            return fetch('http://192.168.0.113:8080/solicitudes', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -885,7 +886,7 @@ export default function Formulario() {
         return;
       }
 
-      const res = await fetch(`http://localhost:8080/solicitudes/usuario/${userId}?page=${page - 1}&size=2`, {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/usuario/${userId}?page=${page - 1}&size=2`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
