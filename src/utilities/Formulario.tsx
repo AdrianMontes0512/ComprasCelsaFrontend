@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaExclamationCircle, FaBoxOpen, FaFileAlt, FaCalculator, FaDollarSign, FaRuler, FaMoneyBillWave, FaImage, FaPaperPlane, FaPlus, FaCogs, FaCheck, FaTimes, FaHistory, FaEye, FaBuilding } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
 const sps = ['Producto', 'Servicio','Activo'];
@@ -583,6 +584,7 @@ function FormularioIndividual({
 }
 
 export default function Formulario() {
+  const navigate = useNavigate();
   const usuarioId = Number(localStorage.getItem('userId'));
   const userRole = localStorage.getItem('role') || '';
   
@@ -958,40 +960,32 @@ export default function Formulario() {
         </div>
         
         <button
-          onClick={() => cargarMisSolicitudes()}
-          disabled={loadingHistory}
+          onClick={() => navigate('/mis-solicitudes')}
           style={{
-            background: 'rgba(255, 255, 255, 0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '16px',
-            padding: '0.75rem 1.5rem',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
             color: '#fff',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '0.75rem 1.5rem',
             fontWeight: 600,
-            fontSize: '0.95rem',
-            cursor: loadingHistory ? 'not-allowed' : 'pointer',
+            fontSize: '1rem',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)',
             transition: 'all 0.3s ease',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            opacity: loadingHistory ? 0.7 : 1
+            gap: '0.5rem'
           }}
           onMouseOver={e => {
-            if (!loadingHistory) {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
-            }
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
           }}
           onMouseOut={e => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
           }}
         >
-          <FaEye style={{ fontSize: '1rem' }} />
-          {loadingHistory ? 'Cargando...' : 'Mis Solicitudes'}
+          📋 Mis Solicitudes
         </button>
       </div>
 

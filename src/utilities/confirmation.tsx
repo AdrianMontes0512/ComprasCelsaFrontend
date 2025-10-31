@@ -20,6 +20,8 @@ interface Solicitud {
   comentarios?: string;
   fecha?: string;
   maquina?: string;
+  fechaOrden?: string;
+  status?: string;
 }
 
 const PAGE_SIZE = 14;
@@ -100,6 +102,11 @@ export default function ConfirmationTable() {
   const [tempPrecio, setTempPrecio] = useState('');
   const [tempUnidad, setTempUnidad] = useState('');
   const [tempMoneda, setTempMoneda] = useState('');
+
+  // Estados para edición de status y fechaOrden
+  const [editingStatusFechaOrden, setEditingStatusFechaOrden] = useState(false);
+  const [tempStatus, setTempStatus] = useState('');
+  const [tempFechaOrden, setTempFechaOrden] = useState('');
 
   useEffect(() => {
     const fetchSolicitudes = async () => {
@@ -187,7 +194,7 @@ export default function ConfirmationTable() {
     // eslint-disable-next-line
   }, [solicitudes]);
 
-  // Nueva función para descargar la imagen
+  // Nueva función para descargar la imagen como PDF
   const descargarImagen = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
@@ -202,7 +209,7 @@ export default function ConfirmationTable() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `solicitud_${id}_imagen`;
+      a.download = `solicitud_${id}_imagen.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -228,6 +235,9 @@ export default function ConfirmationTable() {
     setTempUnidad(solicitud.umedida || '');
     setTempMoneda(solicitud.moneda || '');
     setEditingComercial(false);
+    setTempStatus(solicitud.status || '');
+    setTempFechaOrden(solicitud.fechaOrden || '');
+    setEditingStatusFechaOrden(false);
     setShowDetailModal(true);
   };
 
@@ -519,6 +529,75 @@ export default function ConfirmationTable() {
       }
     } catch (err) {
       alert('❌ Error de conexión al actualizar la información comercial');
+    }
+  };
+
+  // Funciones para edición de status y fechaOrden
+  const iniciarEdicionStatusFechaOrden = () => {
+    setEditingStatusFechaOrden(true);
+  };
+
+  const cancelarEdicionStatusFechaOrden = () => {
+    if (selectedSolicitud) {
+      setTempStatus(selectedSolicitud.status || '');
+      setTempFechaOrden(selectedSolicitud.fechaOrden || '');
+    }
+    setEditingStatusFechaOrden(false);
+  };
+
+  const guardarStatusFechaOrden = async () => {
+    if (!selectedSolicitud) return;
+
+    const token = localStorage.getItem('token');
+    const body = { 
+      status: tempStatus,
+      fechaOrden: tempFechaOrden
+    };
+
+    try {
+      const res = await fetch(`http://192.168.0.113:8080/solicitudes/${selectedSolicitud.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        // Recargar los datos desde el servidor
+        const fetchSolicitudes = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://192.168.0.113:8080/solicitudes?page=${page - 1}&size=${PAGE_SIZE}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const data = await res.json();
+            setSolicitudes(data.content || []);
+            
+            const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
+            if (solicitudActualizada) {
+              setSelectedSolicitud(solicitudActualizada);
+              setTempStatus(solicitudActualizada.status || '');
+              setTempFechaOrden(solicitudActualizada.fechaOrden || '');
+            }
+          } catch (err) {
+            console.error('Error al recargar solicitudes:', err);
+          }
+        };
+        
+        await fetchSolicitudes();
+        
+        setEditingStatusFechaOrden(false);
+        alert('✅ Status y Fecha de Orden actualizados correctamente');
+      } else {
+        const errorText = await res.text();
+        alert('❌ Error al actualizar: ' + errorText);
+      }
+    } catch (err) {
+      alert('❌ Error de conexión al actualizar');
     }
   };
 
@@ -1458,6 +1537,191 @@ export default function ConfirmationTable() {
               overflowY: 'auto',
               paddingRight: '0.5rem'
             }}>
+              {/* NUEVO: Status y Fecha Orden - PRIMERO */}
+              <div style={{
+                background: '#fef2f2',
+                borderRadius: '10px',
+                padding: '1rem',
+                marginBottom: '1rem',
+                border: '1px solid #f73317'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.75rem'
+                }}>
+                  <h4 style={{
+                    margin: 0,
+                    color: '#991b1b',
+                    fontSize: '1rem',
+                    fontWeight: 600
+                  }}>
+                    📦 Status y Fecha de Orden
+                  </h4>
+                  
+                  {!editingStatusFechaOrden ? (
+                    <button
+                      onClick={iniciarEdicionStatusFechaOrden}
+                      style={{
+                        background: '#f73317',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={e => {
+                        e.currentTarget.style.background = '#e02b0f';
+                      }}
+                      onMouseOut={e => {
+                        e.currentTarget.style.background = '#f73317';
+                      }}
+                    >
+                      ✏️ Editar
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={guardarStatusFechaOrden}
+                        style={{
+                          background: '#22c55e',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        ✅ Guardar
+                      </button>
+                      <button
+                        onClick={cancelarEdicionStatusFechaOrden}
+                        style={{
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        ❌ Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '1rem'
+                }}>
+                  <div>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: '#991b1b',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                      marginBottom: '0.25rem'
+                    }}>
+                      Status
+                    </div>
+                    {!editingStatusFechaOrden ? (
+                      <div style={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#7f1d1d',
+                        padding: '0.5rem',
+                        background: '#fff',
+                        borderRadius: '6px',
+                        border: '1px solid #fecaca',
+                        fontStyle: selectedSolicitud.status ? 'normal' : 'italic'
+                      }}>
+                        {selectedSolicitud.status ? selectedSolicitud.status.replace('_', ' ') : 'No especificado'}
+                      </div>
+                    ) : (
+                      <select
+                        value={tempStatus}
+                        onChange={(e) => setTempStatus(e.target.value)}
+                        style={{
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          border: '2px solid #f73317',
+                          fontSize: '0.85rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          width: '100%'
+                        }}
+                      >
+                        <option value="">Seleccionar status</option>
+                        <option value="Entregado">Entregado</option>
+                        <option value="En_Proceso">En Proceso</option>
+                        <option value="Parcialmente_Entregado">Parcialmente Entregado</option>
+                      </select>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: '#991b1b',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                      marginBottom: '0.25rem'
+                    }}>
+                      Fecha Orden
+                    </div>
+                    {!editingStatusFechaOrden ? (
+                      <div style={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#7f1d1d',
+                        padding: '0.5rem',
+                        background: '#fff',
+                        borderRadius: '6px',
+                        border: '1px solid #fecaca',
+                        fontStyle: selectedSolicitud.fechaOrden ? 'normal' : 'italic'
+                      }}>
+                        {selectedSolicitud.fechaOrden ? (
+                          new Date(selectedSolicitud.fechaOrden).toLocaleDateString('es-PE')
+                        ) : (
+                          'No especificada'
+                        )}
+                      </div>
+                    ) : (
+                      <input
+                        type="date"
+                        value={tempFechaOrden}
+                        onChange={(e) => setTempFechaOrden(e.target.value)}
+                        style={{
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          border: '2px solid #f73317',
+                          fontSize: '0.85rem',
+                          fontWeight: 500,
+                          backgroundColor: '#fff',
+                          color: '#374151',
+                          outline: 'none',
+                          width: '100%'
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Estado y Prioridad */}
               <div style={{
                 display: 'flex',
