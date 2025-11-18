@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import logo from '../assets/logo.jpg';
 import bg6 from '../assets/bg2.jpg';
 import { Login } from '../services/auth';
@@ -10,7 +10,31 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Agregar estilos al montar el componente
+  useEffect(() => {
+    const styleId = 'login-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,41 +206,76 @@ export default function LoginPage() {
                 <Lock size={18} style={{ color: '#f73317' }} />
                 Contraseña
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '0.875rem 1rem',
-                  backgroundColor: loading ? '#f3f4f6' : '#f8f9fa',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '12px',
-                  fontSize: '0.95rem',
-                  color: loading ? '#9ca3af' : '#1f2937',
-                  outline: 'none',
-                  transition: 'all 0.2s ease',
-                  boxSizing: 'border-box',
-                  cursor: loading ? 'not-allowed' : 'text',
-                }}
-                onFocus={(e) => {
-                  if (!loading) {
-                    e.target.style.borderColor = '#f73317';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(247, 51, 23, 0.1)';
-                    e.target.style.backgroundColor = '#ffffff';
-                  }
-                }}
-                onBlur={(e) => {
-                  if (!loading) {
-                    e.target.style.borderColor = '#d1d5db';
-                    e.target.style.boxShadow = 'none';
-                    e.target.style.backgroundColor = '#f8f9fa';
-                  }
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  disabled={loading}
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 3rem 0.875rem 1rem',
+                    backgroundColor: loading ? '#f3f4f6' : '#f8f9fa',
+                    border: '2px solid #d1d5db',
+                    borderRadius: '12px',
+                    fontSize: '0.95rem',
+                    color: loading ? '#9ca3af' : '#1f2937',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box',
+                    cursor: loading ? 'not-allowed' : 'text',
+                  }}
+                  onFocus={(e) => {
+                    if (!loading) {
+                      e.target.style.borderColor = '#f73317';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(247, 51, 23, 0.1)';
+                      e.target.style.backgroundColor = '#ffffff';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!loading) {
+                      e.target.style.borderColor = '#d1d5db';
+                      e.target.style.boxShadow = 'none';
+                      e.target.style.backgroundColor = '#f8f9fa';
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  style={{
+                    position: 'absolute',
+                    right: '1rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    color: '#6b7280',
+                    padding: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: loading ? 0.5 : 1,
+                    transition: 'color 0.2s ease',
+                  }}
+                  onMouseOver={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.color = '#f73317';
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.color = '#6b7280';
+                    }
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -291,16 +350,6 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-
-        {/* CSS Animation */}
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}
-        </style>
       </div>
 
       {/* Pantalla de carga completa */}

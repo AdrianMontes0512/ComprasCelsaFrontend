@@ -1,17 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { ChevronDown, LogOut, User } from 'lucide-react';
+import { ChevronDown, LogOut, User, Key } from 'lucide-react';
 import bg6 from '../assets/bg2.jpg'; // Importa la imagen de fondo
 import logo from '../assets/logo.jpg'; // Importa el logo
 import Formulario from '../utilities/Formulario';
 import Confirmation from '../utilities/confirmation';
 import Jefes from '../utilities/Jefes'; // Asegúrate de importar el componente
 import LoadingScreen from '../utilities/LoadingScreen';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
 export default function MainPage() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   const firstName = localStorage.getItem('firstname') || '';
   const lastName = localStorage.getItem('lastname') || '';
@@ -47,6 +49,35 @@ export default function MainPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isDropdownOpen]);
+
+  // Agregar estilos al montar el componente
+  useEffect(() => {
+    const styleId = 'mainpage-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -214,6 +245,38 @@ export default function MainPage() {
                 </div>
               </div>
 
+              {/* Change Password Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsChangePasswordModalOpen(true);
+                  setIsDropdownOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: '#333',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'background-color 0.2s ease',
+                  borderBottom: '1px solid #eee',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f0f0f0';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <Key size={16} />
+                Cambiar Contraseña
+              </button>
+
               {/* Logout Button */}
               <button
                 onClick={(e) => {
@@ -301,21 +364,11 @@ export default function MainPage() {
         )}
       </div>
 
-      {/* Agregar estilos CSS para la animación */}
-      <style>
-        {`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(-10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
+      {/* Modal de Cambio de Contraseña */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
+      />
 
       {/* Pantalla de carga para logout */}
       {isLoggingOut && (

@@ -17,6 +17,7 @@ interface Solicitud {
   motivo: string;
   familia: string;
   subFamilia: string;
+  fecha?: string;
 }
 
 const PAGE_SIZE = 14;
@@ -95,7 +96,7 @@ export default function JefesTable() {
       Subfamilia: s.subFamilia,
       Cantidad: s.cantidad,
       Precio: s.precio,
-      Unidad: s.umedida,
+      'Fecha Solicitud': s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
@@ -394,7 +395,7 @@ export default function JefesTable() {
                 <th style={thStyle}>📝 Descripción</th>
                 <th style={thStyle}>🔢 Cantidad</th>
                 <th style={thStyle}>💰 Precio</th>
-                <th style={thStyle}>📏 Unidad</th>
+                <th style={thStyle}>📅 Fecha Solicitud</th>
                 <th style={thStyle}>Moneda</th>
                 <th style={thStyle}>📊 Estado</th>
                 <th style={thStyle}>Orden de Compra</th>
@@ -510,7 +511,15 @@ export default function JefesTable() {
                       {parseFloat(s.precio).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                     </span>
                   </td>
-                  <td style={tdStyle}>{s.umedida}</td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      fontWeight: 500,
+                      color: '#6b7280',
+                      fontSize: '0.85rem'
+                    }}>
+                      {s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha'}
+                    </span>
+                  </td>
                   <td style={tdStyle}>{s.moneda}</td>
                   <td style={tdStyle}>
                     <select
@@ -868,11 +877,11 @@ export default function JefesTable() {
                 }}
                 onMouseOver={e => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 51, 23, 0.4)';
+                  e.currentTarget.style.boxShadow: '0 6px 20px rgba(247, 51, 23, 0.4)';
                 }}
                 onMouseOut={e => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(247, 51, 23, 0.3)';
+                  e.currentTarget.style.boxShadow: '0 4px 15px rgba(247, 51, 23, 0.3)';
                 }}
               >
                 ✅ Confirmar Cambio

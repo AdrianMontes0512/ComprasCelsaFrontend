@@ -137,7 +137,7 @@ export default function MySolicitudes() {
       Subfamilia: s.subFamilia,
       Cantidad: s.cantidad,
       Precio: s.precio,
-      Unidad: s.umedida,
+      'Fecha Solicitud': s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
@@ -431,7 +431,7 @@ export default function MySolicitudes() {
                 <th style={thStyle}>📝 Descripción</th>
                 <th style={thStyle}>🔢 Cantidad</th>
                 <th style={thStyle}>💰 Precio</th>
-                <th style={thStyle}>📏 Unidad</th>
+                <th style={thStyle}>📅 Fecha Solicitud</th>
                 <th style={thStyle}>💱 Moneda</th>
                 <th style={thStyle}>📊 Estado</th>
                 <th style={thStyle}>🛒 Orden</th>
@@ -546,7 +546,15 @@ export default function MySolicitudes() {
                       {parseFloat(s.precio).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                     </span>
                   </td>
-                  <td style={tdStyle}>{s.umedida}</td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      fontWeight: 500,
+                      color: '#6b7280',
+                      fontSize: '0.85rem'
+                    }}>
+                      {s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha'}
+                    </span>
+                  </td>
                   <td style={tdStyle}>{s.moneda}</td>
                   <td style={tdStyle}>
                     <span style={{
