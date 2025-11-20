@@ -17,10 +17,12 @@ interface Solicitud {
   motivo: string;
   familia: string;
   subFamilia: string;
+  comentarios?: string;
   fecha?: string;
+  maquina?: string;
+  fechaOrden?: string;
   status?: string;
 }
-
 const PAGE_SIZE = 14;
 
 const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
@@ -37,6 +39,12 @@ export default function JefesTable() {
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroUsuario, setFiltroUsuario] = useState('');
   const [filtroId, setFiltroId] = useState('');
+  const [filtroOrdenCompra, setFiltroOrdenCompra] = useState('');
+
+  const [filtroFechaDesde, setFiltroFechaDesde] = useState('');
+
+  const [filtroFechaHasta, setFiltroFechaHasta] = useState('');
+
   const [usuarios, setUsuarios] = useState<{ [id: number]: string }>({});
 
   // Estados para el modal de confirmación
@@ -77,13 +85,40 @@ export default function JefesTable() {
   }, [page]);
 
   // Filtrado en frontend
-  const solicitudesFiltradas = solicitudes.filter(s =>
-    (filtroPrioridad ? s.prioridad === filtroPrioridad : true) &&
-    (filtroTipo ? s.sp === filtroTipo : true) &&
-    (filtroEstado ? s.estado === filtroEstado : true) &&
-    (filtroUsuario ? (usuarios[s.usuarioId] || '').toLowerCase().includes(filtroUsuario.toLowerCase()) : true) &&
-    (filtroId ? s.id.toString().includes(filtroId) : true)
-  );
+  const solicitudesFiltradas = solicitudes.filter(s => {
+    // Filtros existentes
+    const matchPrioridad = filtroPrioridad ? s.prioridad === filtroPrioridad : true;
+    const matchTipo = filtroTipo ? s.sp === filtroTipo : true;
+    const matchEstado = filtroEstado ? s.estado === filtroEstado : true;
+    const matchUsuario = filtroUsuario ? (usuarios[s.usuarioId] || '').toLowerCase().includes(filtroUsuario.toLowerCase()) : true;
+    const matchId = filtroId ? s.id.toString().includes(filtroId) : true;
+
+    // Nuevo filtro de orden de compra
+    let matchOrdenCompra = true;
+    if (filtroOrdenCompra === 'con') {
+      matchOrdenCompra = !!s.ordenCompra && s.ordenCompra.trim() !== '';
+    } else if (filtroOrdenCompra === 'sin') {
+      matchOrdenCompra = !s.ordenCompra || s.ordenCompra.trim() === '';
+    }
+
+    // Nuevo filtro de fecha
+    let matchFecha = true;
+    if (s.fecha) {
+      if (filtroFechaDesde && s.fecha < filtroFechaDesde) {
+        matchFecha = false;
+      }
+      if (filtroFechaHasta && s.fecha > filtroFechaHasta) {
+        matchFecha = false;
+      }
+    } else {
+      // Si no tiene fecha, solo mostrar cuando no hay filtros de fecha activos
+      if (filtroFechaDesde || filtroFechaHasta) {
+        matchFecha = false;
+      }
+    }
+
+    return matchPrioridad && matchTipo && matchEstado && matchUsuario && matchId && matchOrdenCompra && matchFecha;
+  });
 
   // Función para exportar a Excel
   const exportToExcel = () => {
@@ -100,8 +135,12 @@ export default function JefesTable() {
       'Fecha Solicitud': s.fecha || 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
+      Status: s.status || 'Sin status',
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
-      Usuario: usuarios[s.usuarioId] || 'Desconocido',
+      Comentarios: s.comentarios || 'Sin comentarios',
+      Máquina: s.maquina || 'No especificada',
+      'Fecha Orden': s.fechaOrden || 'Sin fecha',
+      Usuario: usuarios[s.usuarioId] || 'Desconocido'
     }));
 
     const ws = XLSX.utils.json_to_sheet(dataToExport);

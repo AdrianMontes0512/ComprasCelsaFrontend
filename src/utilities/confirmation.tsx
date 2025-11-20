@@ -65,6 +65,12 @@ export default function ConfirmationTable() {
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroUsuario, setFiltroUsuario] = useState('');
   const [filtroId, setFiltroId] = useState('');
+  const [filtroOrdenCompra, setFiltroOrdenCompra] = useState('');
+
+  const [filtroFechaDesde, setFiltroFechaDesde] = useState('');
+
+  const [filtroFechaHasta, setFiltroFechaHasta] = useState('');
+
   const [usuarios, setUsuarios] = useState<{ [id: number]: string }>({});
 
   // Estados para el modal de orden de compra
@@ -132,40 +138,94 @@ export default function ConfirmationTable() {
   }, [page]);
 
   // Filtrado en frontend
-  const solicitudesFiltradas = solicitudes.filter(s =>
-    (filtroPrioridad ? s.prioridad === filtroPrioridad : true) &&
-    (filtroTipo ? s.sp === filtroTipo : true) &&
-    (filtroEstado ? s.estado === filtroEstado : true) &&
-    (filtroUsuario ? (usuarios[s.usuarioId] || '').toLowerCase().includes(filtroUsuario.toLowerCase()) : true) &&
-    (filtroId ? s.id.toString().includes(filtroId) : true)
-  );
+  const solicitudesFiltradas = solicitudes.filter(s => {
+    // Filtros existentes
+    const matchPrioridad = filtroPrioridad ? s.prioridad === filtroPrioridad : true;
+    const matchTipo = filtroTipo ? s.sp === filtroTipo : true;
+    const matchEstado = filtroEstado ? s.estado === filtroEstado : true;
+    const matchUsuario = filtroUsuario ? (usuarios[s.usuarioId] || '').toLowerCase().includes(filtroUsuario.toLowerCase()) : true;
+    const matchId = filtroId ? s.id.toString().includes(filtroId) : true;
+
+    // Nuevo filtro de orden de compra
+    let matchOrdenCompra = true;
+    if (filtroOrdenCompra === 'con') {
+      matchOrdenCompra = !!s.ordenCompra && s.ordenCompra.trim() !== '';
+    } else if (filtroOrdenCompra === 'sin') {
+      matchOrdenCompra = !s.ordenCompra || s.ordenCompra.trim() === '';
+    }
+
+    // Nuevo filtro de fecha
+    let matchFecha = true;
+    if (s.fecha) {
+      if (filtroFechaDesde && s.fecha < filtroFechaDesde) {
+        matchFecha = false;
+      }
+      if (filtroFechaHasta && s.fecha > filtroFechaHasta) {
+        matchFecha = false;
+      }
+    } else {
+      // Si no tiene fecha, solo mostrar cuando no hay filtros de fecha activos
+      if (filtroFechaDesde || filtroFechaHasta) {
+        matchFecha = false;
+      }
+    }
+
+    return matchPrioridad && matchTipo && matchEstado && matchUsuario && matchId && matchOrdenCompra && matchFecha;
+  });
 
   // Función para exportar a Excel
-  const exportToExcel = () => {
-    // Exporta las solicitudes filtradas, mostrando el nombre del usuario (sin la columna Imagen)
-    const dataToExport = solicitudesFiltradas.map((s) => ({
-      ID: s.id,
-      Prioridad: s.prioridad,
-      Tipo: s.sp,
-      Descripción: s.descripcion,
-      Motivo: s.motivo,
-      Familia: s.familia,
-      Subfamilia: s.subFamilia,
-      Cantidad: s.cantidad,
-      Precio: s.precio,
-      'Fecha Solicitud': s.fecha || 'Sin fecha',
-      Moneda: s.moneda,
-      Estado: s.estado,
-      'Orden de Compra': s.ordenCompra || 'Sin asignar',
-      Usuario: usuarios[s.usuarioId] || 'Desconocido',
-    }));
+  const exportToExcel = async () => {
+    const token = localStorage.getItem('token');
 
-    const ws = XLSX.utils.json_to_sheet(dataToExport);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Solicitudes');
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(data, 'solicitudes.xlsx');
+    try {
+      // Hacer fetch al endpoint /solicitudes/all para obtener TODAS las solicitudes
+      const res = await fetch('http://192.168.0.113:8080/solicitudes/all', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        alert('❌ Error al obtener las solicitudes del servidor');
+        return;
+      }
+
+      const todasLasSolicitudes = await res.json();
+
+      // Exportar TODAS las solicitudes obtenidas del backend
+      const dataToExport = todasLasSolicitudes.map((s: Solicitud) => ({
+        ID: s.id,
+        Prioridad: s.prioridad,
+        Tipo: s.sp,
+        Descripción: s.descripcion,
+        Motivo: s.motivo,
+        Familia: s.familia,
+        Subfamilia: s.subFamilia,
+        Cantidad: s.cantidad,
+        Precio: s.precio,
+        'Fecha Solicitud': s.fecha || 'Sin fecha',
+        Moneda: s.moneda,
+        Estado: s.estado,
+        Status: s.status || 'Sin status',
+        'Orden de Compra': s.ordenCompra || 'Sin asignar',
+        Comentarios: s.comentarios || 'Sin comentarios',
+        Máquina: s.maquina || 'No especificada',
+        'Fecha Orden': s.fechaOrden || 'Sin fecha',
+        Usuario: usuarios[s.usuarioId] || 'Desconocido'
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Solicitudes');
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+      saveAs(data, 'todas_las_solicitudes.xlsx');
+
+      console.log(`✅ Exportadas ${todasLasSolicitudes.length} solicitudes a Excel`);
+    } catch (error) {
+      console.error('❌ Error al exportar a Excel:', error);
+      alert('❌ Error al exportar las solicitudes a Excel');
+    }
   };
 
   // Fetch usuarios para la página actual
@@ -767,6 +827,62 @@ export default function ConfirmationTable() {
           placeholder="🆔 Buscar por ID"
           value={filtroId}
           onChange={e => setFiltroId(e.target.value)}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: '10px',
+            border: '2px solid #e5e7eb',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            backgroundColor: '#fff',
+            color: '#374151',
+            outline: 'none',
+            transition: 'all 0.2s ease',
+            minWidth: '150px'
+          }}
+        />
+        <select
+          value={filtroOrdenCompra}
+          onChange={e => setFiltroOrdenCompra(e.target.value)}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: '10px',
+            border: '2px solid #e5e7eb',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            backgroundColor: '#fff',
+            color: '#374151',
+            outline: 'none',
+            transition: 'all 0.2s ease',
+            minWidth: '150px'
+          }}
+        >
+          <option value="">🛒 Orden de compra</option>
+          <option value="con">Con orden de compra</option>
+          <option value="sin">Sin orden de compra</option>
+        </select>
+        <input
+          type="date"
+          value={filtroFechaDesde}
+          onChange={e => setFiltroFechaDesde(e.target.value)}
+          placeholder="📅 Desde"
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: '10px',
+            border: '2px solid #e5e7eb',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            backgroundColor: '#fff',
+            color: '#374151',
+            outline: 'none',
+            transition: 'all 0.2s ease',
+            minWidth: '150px'
+          }}
+        />
+        <input
+          type="date"
+          value={filtroFechaHasta}
+          onChange={e => setFiltroFechaHasta(e.target.value)}
+          placeholder="📅 Hasta"
           style={{
             padding: '0.6rem 1rem',
             borderRadius: '10px',

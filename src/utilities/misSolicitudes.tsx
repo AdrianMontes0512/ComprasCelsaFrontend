@@ -40,6 +40,12 @@ export default function MySolicitudes() {
   const [filtroTipo, setFiltroTipo] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroId, setFiltroId] = useState('');
+  const [filtroOrdenCompra, setFiltroOrdenCompra] = useState('');
+
+  const [filtroFechaDesde, setFiltroFechaDesde] = useState('');
+
+  const [filtroFechaHasta, setFiltroFechaHasta] = useState('');
+
   const [usuarios, setUsuarios] = useState<{ [id: number]: string }>({});
 
   // Estados para el modal de detalles (solo lectura)
@@ -102,7 +108,7 @@ export default function MySolicitudes() {
   // AGREGAR: Resetear página cuando cambien los filtros
   useEffect(() => {
     setPage(1);
-  }, [filtroPrioridad, filtroTipo, filtroEstado, filtroId]);
+  }, [filtroPrioridad, filtroTipo, filtroEstado, filtroId, filtroOrdenCompra, filtroFechaDesde, filtroFechaHasta]);
 
   // CAMBIAR: Ahora NO necesitamos filtrado ni paginación local
   // porque el backend ya maneja la paginación
@@ -140,18 +146,20 @@ export default function MySolicitudes() {
       'Fecha Solicitud': s.fecha || 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
+      Status: s.status || 'Sin status',
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
+      Comentarios: s.comentarios || 'Sin comentarios',
       Máquina: s.maquina || 'No especificada',
-      Fecha: s.fecha || 'No especificada',
-      Comentarios: s.comentarios || 'Sin comentarios'
+      'Fecha Orden': s.fechaOrden || 'Sin fecha',
+      Usuario: usuarios[s.usuarioId] || 'Desconocido'
     }));
 
     const ws = XLSX.utils.json_to_sheet(dataToExport);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Mis Solicitudes');
+    XLSX.utils.book_append_sheet(wb, ws, 'Solicitudes');
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(data, 'mis_solicitudes.xlsx');
+    saveAs(data, 'solicitudes.xlsx');
   };
 
   // Fetch usuarios para mostrar nombres
