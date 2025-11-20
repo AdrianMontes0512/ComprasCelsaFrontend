@@ -37,7 +37,7 @@ export default function JefesTable() {
   const [filtroUsuario, setFiltroUsuario] = useState('');
   const [filtroId, setFiltroId] = useState('');
   const [usuarios, setUsuarios] = useState<{ [id: number]: string }>({});
-  
+
   // Estados para el modal de confirmación
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<{
@@ -96,7 +96,7 @@ export default function JefesTable() {
       Subfamilia: s.subFamilia,
       Cantidad: s.cantidad,
       Precio: s.precio,
-      'Fecha Solicitud': s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha',
+      'Fecha Solicitud': s.fecha || 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
@@ -168,14 +168,14 @@ export default function JefesTable() {
   };
 
   return (
-    <div style={{ 
+    <div style={{
       position: 'absolute',
       left: 0,
       right: 0,
       top: 0,
       bottom: 0,
-      padding: '1rem', 
-      width: '100vw', 
+      padding: '1rem',
+      width: '100vw',
       minWidth: '100vw',
       overflowX: 'auto',
       overflowY: 'auto',
@@ -250,18 +250,18 @@ export default function JefesTable() {
       </div>
 
       {/* Filtros */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '1rem', 
-        marginBottom: '2rem', 
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        marginBottom: '2rem',
         justifyContent: 'center',
-        flexWrap: 'wrap' 
+        flexWrap: 'wrap'
       }}>
         <select
           value={filtroPrioridad}
           onChange={e => setFiltroPrioridad(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -279,8 +279,8 @@ export default function JefesTable() {
         <select
           value={filtroTipo}
           onChange={e => setFiltroTipo(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -298,8 +298,8 @@ export default function JefesTable() {
         <select
           value={filtroEstado}
           onChange={e => setFiltroEstado(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -319,8 +319,8 @@ export default function JefesTable() {
           placeholder="👤 Buscar por usuario"
           value={filtroUsuario}
           onChange={e => setFiltroUsuario(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -337,8 +337,8 @@ export default function JefesTable() {
           placeholder="🆔 Buscar por ID"
           value={filtroId}
           onChange={e => setFiltroId(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -405,20 +405,20 @@ export default function JefesTable() {
             </thead>
             <tbody>
               {solicitudesFiltradas.map((s, index) => (
-                <tr key={s.id} style={{ 
-                  textAlign: 'center', 
+                <tr key={s.id} style={{
+                  textAlign: 'center',
                   borderBottom: '1px solid #f1f5f9',
                   backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseOver={e => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.transform = 'scale(1.01)';
-                }}
-                onMouseOut={e => {
-                  e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                    e.currentTarget.style.transform = 'scale(1.01)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
                   <td style={tdStyle}>
                     <button
@@ -455,9 +455,9 @@ export default function JefesTable() {
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       color: '#fff',
-                      backgroundColor: 
-                        s.prioridad === 'Emergencia' ? '#dc2626' : 
-                        s.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                      backgroundColor:
+                        s.prioridad === 'Emergencia' ? '#dc2626' :
+                          s.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
                       textTransform: 'uppercase' as const,
                       letterSpacing: '0.3px',
                       whiteSpace: 'nowrap' as const,
@@ -517,7 +517,7 @@ export default function JefesTable() {
                       color: '#6b7280',
                       fontSize: '0.85rem'
                     }}>
-                      {s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha'}
+                      {s.fecha || 'Sin fecha'}
                     </span>
                   </td>
                   <td style={tdStyle}>{s.moneda}</td>
@@ -526,9 +526,9 @@ export default function JefesTable() {
                       value={s.estado}
                       onChange={(e) => {
                         const nuevoEstado = e.target.value;
-                        
+
                         if (nuevoEstado === s.estado) return;
-                        
+
                         setModalData({
                           solicitud: s,
                           nuevoEstado,
@@ -569,8 +569,8 @@ export default function JefesTable() {
                         });
                         setShowModal(true);
                       }}
-                      style={{ 
-                        padding: '0.5rem', 
+                      style={{
+                        padding: '0.5rem',
                         borderRadius: '8px',
                         border: '2px solid #e5e7eb',
                         fontSize: '0.85rem',
@@ -647,11 +647,11 @@ export default function JefesTable() {
               ))}
             </tbody>
           </table>
-          
-          <div style={{ 
-            marginTop: '2rem', 
-            display: 'flex', 
-            justifyContent: 'center', 
+
+          <div style={{
+            marginTop: '2rem',
+            display: 'flex',
+            justifyContent: 'center',
             gap: '1rem',
             alignItems: 'center'
           }}>
@@ -760,21 +760,21 @@ export default function JefesTable() {
             }}>
               <div style={{ marginBottom: '1rem' }}>
                 <span style={{ fontWeight: 600, color: '#374151' }}>Solicitud: </span>
-                <span style={{ 
-                  backgroundColor: '#dbeafe', 
-                  color: '#1e40af', 
-                  padding: '0.25rem 0.5rem', 
+                <span style={{
+                  backgroundColor: '#dbeafe',
+                  color: '#1e40af',
+                  padding: '0.25rem 0.5rem',
                   borderRadius: '6px',
                   fontWeight: 600
                 }}>
                   RQ{modalData.solicitud.id}
                 </span>
               </div>
-              
+
               <div style={{ marginBottom: '1rem' }}>
                 <span style={{ fontWeight: 600, color: '#374151' }}>Descripción: </span>
-                <div style={{ 
-                  color: '#6b7280', 
+                <div style={{
+                  color: '#6b7280',
                   marginTop: '0.25rem',
                   lineHeight: '1.5'
                 }}>
@@ -804,9 +804,9 @@ export default function JefesTable() {
                     {modalData.solicitud.estado}
                   </span>
                 </div>
-                
+
                 <div style={{ fontSize: '1.5rem', color: '#6b7280' }}>→</div>
-                
+
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>NUEVO ESTADO</div>
                   <span style={{
@@ -814,10 +814,10 @@ export default function JefesTable() {
                     borderRadius: '20px',
                     fontSize: '0.85rem',
                     fontWeight: 600,
-                    backgroundColor: modalData.nuevoEstado === 'Aprobado' ? '#dcfce7' : 
-                                   modalData.nuevoEstado === 'Rechazado' ? '#fecaca' : '#fef3c7',
-                    color: modalData.nuevoEstado === 'Aprobado' ? '#166534' : 
-                           modalData.nuevoEstado === 'Rechazado' ? '#dc2626' : '#92400e'
+                    backgroundColor: modalData.nuevoEstado === 'Aprobado' ? '#dcfce7' :
+                      modalData.nuevoEstado === 'Rechazado' ? '#fecaca' : '#fef3c7',
+                    color: modalData.nuevoEstado === 'Aprobado' ? '#166534' :
+                      modalData.nuevoEstado === 'Rechazado' ? '#dc2626' : '#92400e'
                   }}>
                     {modalData.nuevoEstado}
                   </span>
@@ -855,7 +855,7 @@ export default function JefesTable() {
               >
                 ❌ Cancelar
               </button>
-              
+
               <button
                 onClick={modalData.onConfirm}
                 style={{
@@ -948,7 +948,7 @@ export default function JefesTable() {
                   Detalles de Solicitud
                 </h3>
               </div>
-              
+
               <button
                 onClick={() => setShowDetailModal(false)}
                 style={{
@@ -996,9 +996,9 @@ export default function JefesTable() {
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   color: '#fff',
-                  backgroundColor: 
-                    selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' : 
-                    selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
+                  backgroundColor:
+                    selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' :
+                      selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -1010,9 +1010,9 @@ export default function JefesTable() {
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   color: '#fff',
-                  backgroundColor: 
-                    selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' : 
-                    selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                  backgroundColor:
+                    selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' :
+                      selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -1036,7 +1036,7 @@ export default function JefesTable() {
                 }}>
                   📝 Información Principal
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -1060,7 +1060,7 @@ export default function JefesTable() {
                       {selectedSolicitud.sp}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1080,7 +1080,7 @@ export default function JefesTable() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div style={{ marginTop: '1rem' }}>
                   <div style={{
                     fontSize: '0.75rem',
@@ -1121,7 +1121,7 @@ export default function JefesTable() {
                 }}>
                   🏷️ Categorización
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -1145,7 +1145,7 @@ export default function JefesTable() {
                       {selectedSolicitud.familia || 'No especificado'}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1203,7 +1203,7 @@ export default function JefesTable() {
                 }}>
                   💰 Información Comercial
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr 1fr',
@@ -1227,7 +1227,7 @@ export default function JefesTable() {
                       {selectedSolicitud.cantidad}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1246,7 +1246,7 @@ export default function JefesTable() {
                       {selectedSolicitud.umedida}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1266,7 +1266,7 @@ export default function JefesTable() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div style={{
                   marginTop: '0.75rem',
                   padding: '0.75rem',
@@ -1289,8 +1289,8 @@ export default function JefesTable() {
                     fontWeight: 700,
                     color: '#059669'
                   }}>
-                    {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', { 
-                      minimumFractionDigits: 2 
+                    {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', {
+                      minimumFractionDigits: 2
                     })} {selectedSolicitud.moneda}
                   </div>
                 </div>
@@ -1312,7 +1312,7 @@ export default function JefesTable() {
                   }}>
                     🛒 Orden de Compra
                   </h4>
-                  
+
                   <div style={{
                     fontSize: '1.2rem',
                     fontWeight: 700,

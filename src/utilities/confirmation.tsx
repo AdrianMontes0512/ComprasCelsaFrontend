@@ -30,7 +30,7 @@ const prioridades = ['Emergencia', 'Urgencia', 'Estándar'];
 const tipos = ['Producto', 'Servicio'];
 const estados = ['Pendiente', 'Aprobado', 'Rechazado'];
 const monedas = ['Dolares', 'Soles', 'Euros'];
-const unidades = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego']; 
+const unidades = ['unidad', 'litro', 'metro', 'kilo', 'par', 'juego'];
 
 const familiasYSubfamilias = {
   'Materias primas': ['Cobre y metales', 'Plásticos y polímeros', 'Aislantes y recubrimientos', 'Pantallas y blindajes', 'Rellenos y separadores', 'Material conductor', 'Chaquetas y cubiertas', 'Componentes eléctricos', 'Aditivos y auxiliares'],
@@ -53,7 +53,7 @@ const familiasYSubfamilias = {
   'Activos industriales': ['Equipos de proceso', 'Equipos auxiliares de planta', 'Equipos móviles industriales', 'Sistemas de energía y control'],
   'Calidad y laboratorio': ['Equipos de ensayo y medición', 'Equipos de laboratorio físico/químico', 'Calibración y verificación', 'Servicios metrológicos'],
   'Mercadería': ['Cables aac', 'Alambres trolley', 'otros']
-}; 
+};
 
 export default function ConfirmationTable() {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
@@ -66,7 +66,7 @@ export default function ConfirmationTable() {
   const [filtroUsuario, setFiltroUsuario] = useState('');
   const [filtroId, setFiltroId] = useState('');
   const [usuarios, setUsuarios] = useState<{ [id: number]: string }>({});
-  
+
   // Estados para el modal de orden de compra
   const [showOrdenModal, setShowOrdenModal] = useState(false);
   const [modalOrdenData, setModalOrdenData] = useState<{
@@ -81,7 +81,7 @@ export default function ConfirmationTable() {
   // Estados para el modal de detalles
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedSolicitud, setSelectedSolicitud] = useState<Solicitud | null>(null);
-  
+
   // Estados para edición de categorización
   const [editingCategorizacion, setEditingCategorizacion] = useState(false);
   const [tempFamilia, setTempFamilia] = useState('');
@@ -257,7 +257,7 @@ export default function ConfirmationTable() {
     if (!selectedSolicitud) return;
 
     const token = localStorage.getItem('token');
-    const body = { 
+    const body = {
       familia: tempFamilia,
       subFamilia: tempSubFamilia
     };
@@ -284,7 +284,7 @@ export default function ConfirmationTable() {
             });
             const data = await res.json();
             setSolicitudes(data.content || []);
-            
+
             // Actualizar también la solicitud seleccionada con los datos frescos del servidor
             const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
             if (solicitudActualizada) {
@@ -296,10 +296,10 @@ export default function ConfirmationTable() {
             console.error('Error al recargar solicitudes:', err);
           }
         };
-        
+
         // Ejecutar la recarga
         await fetchSolicitudes();
-        
+
         setEditingCategorizacion(false);
         alert('✅ Categorización actualizada correctamente');
       } else {
@@ -330,7 +330,7 @@ export default function ConfirmationTable() {
     if (!selectedSolicitud) return;
 
     const token = localStorage.getItem('token');
-    const body = { 
+    const body = {
       fecha: tempFecha,
       comentarios: tempComentarios
     };
@@ -357,7 +357,7 @@ export default function ConfirmationTable() {
             });
             const data = await res.json();
             setSolicitudes(data.content || []);
-            
+
             // Actualizar también la solicitud seleccionada con los datos frescos del servidor
             const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
             if (solicitudActualizada) {
@@ -369,10 +369,10 @@ export default function ConfirmationTable() {
             console.error('Error al recargar solicitudes:', err);
           }
         };
-        
+
         // Ejecutar la recarga
         await fetchSolicitudes();
-        
+
         setEditingFechaComentarios(false);
         alert('✅ Fecha y comentarios actualizados correctamente');
       } else {
@@ -400,7 +400,7 @@ export default function ConfirmationTable() {
     if (!selectedSolicitud) return;
 
     const token = localStorage.getItem('token');
-    const body = { 
+    const body = {
       maquina: tempMaquina
     };
 
@@ -426,7 +426,7 @@ export default function ConfirmationTable() {
             });
             const data = await res.json();
             setSolicitudes(data.content || []);
-            
+
             // Actualizar también la solicitud seleccionada con los datos frescos del servidor
             const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
             if (solicitudActualizada) {
@@ -437,10 +437,10 @@ export default function ConfirmationTable() {
             console.error('Error al recargar solicitudes:', err);
           }
         };
-        
+
         // Ejecutar la recarga
         await fetchSolicitudes();
-        
+
         setEditingMaquina(false);
         alert('✅ Máquina actualizada correctamente');
       } else {
@@ -471,7 +471,7 @@ export default function ConfirmationTable() {
     if (!selectedSolicitud) return;
 
     const token = localStorage.getItem('token');
-    const body = { 
+    const body = {
       cantidad: tempCantidad,
       precio: tempPrecio,
       umedida: tempUnidad,
@@ -500,7 +500,7 @@ export default function ConfirmationTable() {
             });
             const data = await res.json();
             setSolicitudes(data.content || []);
-            
+
             // Actualizar también la solicitud seleccionada con los datos frescos del servidor
             const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
             if (solicitudActualizada) {
@@ -514,10 +514,10 @@ export default function ConfirmationTable() {
             console.error('Error al recargar solicitudes:', err);
           }
         };
-        
+
         // Ejecutar la recarga
         await fetchSolicitudes();
-        
+
         setEditingComercial(false);
         alert('✅ Información comercial actualizada correctamente');
       } else {
@@ -546,7 +546,7 @@ export default function ConfirmationTable() {
     if (!selectedSolicitud) return;
 
     const token = localStorage.getItem('token');
-    const body = { 
+    const body = {
       status: tempStatus,
       fechaOrden: tempFechaOrden
     };
@@ -573,7 +573,7 @@ export default function ConfirmationTable() {
             });
             const data = await res.json();
             setSolicitudes(data.content || []);
-            
+
             const solicitudActualizada = data.content?.find((s: Solicitud) => s.id === selectedSolicitud.id);
             if (solicitudActualizada) {
               setSelectedSolicitud(solicitudActualizada);
@@ -584,9 +584,9 @@ export default function ConfirmationTable() {
             console.error('Error al recargar solicitudes:', err);
           }
         };
-        
+
         await fetchSolicitudes();
-        
+
         setEditingStatusFechaOrden(false);
         alert('✅ Status y Fecha de Orden actualizados correctamente');
       } else {
@@ -599,14 +599,14 @@ export default function ConfirmationTable() {
   };
 
   return (
-    <div style={{ 
+    <div style={{
       position: 'absolute',
       left: 0,
       right: 0,
       top: 0,
       bottom: 0,
-      padding: '1rem', 
-      width: '100vw', 
+      padding: '1rem',
+      width: '100vw',
       minWidth: '100vw',
       overflowX: 'auto',
       overflowY: 'auto',
@@ -680,18 +680,18 @@ export default function ConfirmationTable() {
       </div>
 
       {/* Filtros */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '1rem', 
-        marginBottom: '2rem', 
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        marginBottom: '2rem',
         justifyContent: 'center',
-        flexWrap: 'wrap' 
+        flexWrap: 'wrap'
       }}>
         <select
           value={filtroPrioridad}
           onChange={e => setFiltroPrioridad(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -709,8 +709,8 @@ export default function ConfirmationTable() {
         <select
           value={filtroTipo}
           onChange={e => setFiltroTipo(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -728,8 +728,8 @@ export default function ConfirmationTable() {
         <select
           value={filtroEstado}
           onChange={e => setFiltroEstado(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -749,8 +749,8 @@ export default function ConfirmationTable() {
           placeholder="👤 Buscar por usuario"
           value={filtroUsuario}
           onChange={e => setFiltroUsuario(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -767,8 +767,8 @@ export default function ConfirmationTable() {
           placeholder="🆔 Buscar por ID"
           value={filtroId}
           onChange={e => setFiltroId(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -817,20 +817,20 @@ export default function ConfirmationTable() {
             </thead>
             <tbody>
               {solicitudesFiltradas.map((s, index) => (
-                <tr key={s.id} style={{ 
-                  textAlign: 'center', 
+                <tr key={s.id} style={{
+                  textAlign: 'center',
                   borderBottom: '1px solid #f1f5f9',
                   backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseOver={e => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.transform = 'scale(1.01)';
-                }}
-                onMouseOut={e => {
-                  e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                    e.currentTarget.style.transform = 'scale(1.01)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
                   <td style={tdStyle}>
                     <button
@@ -867,9 +867,9 @@ export default function ConfirmationTable() {
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       color: '#fff',
-                      backgroundColor: 
-                        s.prioridad === 'Emergencia' ? '#dc2626' : 
-                        s.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                      backgroundColor:
+                        s.prioridad === 'Emergencia' ? '#dc2626' :
+                          s.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
                       textTransform: 'uppercase' as const,
                       letterSpacing: '0.3px',
                       whiteSpace: 'nowrap' as const,
@@ -929,7 +929,7 @@ export default function ConfirmationTable() {
                       color: '#6b7280',
                       fontSize: '0.85rem'
                     }}>
-                      {s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha'}
+                      {s.fecha || 'Sin fecha'}
                     </span>
                   </td>
                   <td style={tdStyle}>{s.moneda}</td>
@@ -940,9 +940,9 @@ export default function ConfirmationTable() {
                       fontSize: '0.85rem',
                       fontWeight: 600,
                       color: '#fff',
-                      backgroundColor: 
-                        s.estado === 'Pendiente' ? '#f59e0b' : 
-                        s.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
+                      backgroundColor:
+                        s.estado === 'Pendiente' ? '#f59e0b' :
+                          s.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
                       textTransform: 'uppercase' as const,
                       letterSpacing: '0.5px'
                     }}>
@@ -959,10 +959,10 @@ export default function ConfirmationTable() {
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               const nuevoValor = e.currentTarget.value.trim();
-                              
+
                               // Si el valor no cambió, no hacer nada
                               if (nuevoValor === (s.ordenCompra || '')) return;
-                              
+
                               // Mostrar modal de confirmación
                               const inputRef = e.currentTarget as HTMLInputElement;
                               const valorOriginal = s.ordenCompra || '';
@@ -972,13 +972,13 @@ export default function ConfirmationTable() {
                                 valorOriginal: valorOriginal,
                                 inputRef: inputRef,
                                 onConfirm: async () => {
-                                  
+
                                   const token = localStorage.getItem('token');
-                                  
+
                                   const body = { ordenCompra: nuevoValor };
-                                  
+
                                   try {
-                                    
+
                                     const res = await fetch(`http://192.168.0.113:8080/solicitudes/${s.id}`, {
                                       method: 'PATCH',
                                       headers: {
@@ -987,11 +987,11 @@ export default function ConfirmationTable() {
                                       },
                                       body: JSON.stringify(body),
                                     });
-                                    
 
-                                    
+
+
                                     if (res.ok) {
-                                      
+
                                       // Recargar los datos desde el servidor para obtener la información más actualizada
                                       const fetchSolicitudes = async () => {
                                         try {
@@ -1007,10 +1007,10 @@ export default function ConfirmationTable() {
                                           console.error('Error al recargar solicitudes:', err);
                                         }
                                       };
-                                      
+
                                       // Ejecutar la recarga
                                       await fetchSolicitudes();
-                                      
+
                                     } else {
                                       const errorText = await res.text();
                                       console.error('❌ Error en response:', errorText);
@@ -1025,11 +1025,11 @@ export default function ConfirmationTable() {
                                   setModalOrdenData(null);
                                 },
                                 onCancel: () => {
-                                // Revertir el input al valor original usando la referencia guardada
-                                inputRef.value = valorOriginal;
-                                setShowOrdenModal(false);
-                                setModalOrdenData(null);
-                              }
+                                  // Revertir el input al valor original usando la referencia guardada
+                                  inputRef.value = valorOriginal;
+                                  setShowOrdenModal(false);
+                                  setModalOrdenData(null);
+                                }
                               });
                               setShowOrdenModal(true);
                             }
@@ -1038,13 +1038,13 @@ export default function ConfirmationTable() {
                             // Primero aplicar estilos
                             e.target.style.borderColor = '#e5e7eb';
                             e.target.style.boxShadow = 'none';
-                            
+
                             // Luego verificar si hay cambios
                             const nuevoValor = e.currentTarget.value.trim();
-                            
+
                             // Si el valor no cambió, no hacer nada
                             if (nuevoValor === (s.ordenCompra || '')) return;
-                            
+
                             // Mostrar modal de confirmación
                             const inputRef = e.currentTarget as HTMLInputElement;
                             const valorOriginal = s.ordenCompra || '';
@@ -1054,13 +1054,13 @@ export default function ConfirmationTable() {
                               valorOriginal: valorOriginal,
                               inputRef: inputRef,
                               onConfirm: async () => {
-                                
+
                                 const token = localStorage.getItem('token');
-                                
+
                                 const body = { ordenCompra: nuevoValor };
-                                
+
                                 try {
-                                  
+
                                   const res = await fetch(`http://192.168.0.113:8080/solicitudes/${s.id}`, {
                                     method: 'PATCH',
                                     headers: {
@@ -1069,11 +1069,11 @@ export default function ConfirmationTable() {
                                     },
                                     body: JSON.stringify(body),
                                   });
-                                  
 
-                                  
+
+
                                   if (res.ok) {
-                                    
+
                                     // Recargar los datos desde el servidor para obtener la información más actualizada
                                     const fetchSolicitudes = async () => {
                                       try {
@@ -1089,10 +1089,10 @@ export default function ConfirmationTable() {
                                         console.error('Error al recargar solicitudes:', err);
                                       }
                                     };
-                                    
+
                                     // Ejecutar la recarga
                                     await fetchSolicitudes();
-                                    
+
                                   } else {
                                     const errorText = await res.text();
                                     console.error('❌ Error en response:', errorText);
@@ -1181,10 +1181,10 @@ export default function ConfirmationTable() {
             </tbody>
           </table>
           {/* Paginación */}
-          <div style={{ 
-            marginTop: '2rem', 
-            display: 'flex', 
-            justifyContent: 'center', 
+          <div style={{
+            marginTop: '2rem',
+            display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
             gap: '1rem',
             flexWrap: 'wrap'
@@ -1196,15 +1196,15 @@ export default function ConfirmationTable() {
                 padding: '0.75rem 1.5rem',
                 borderRadius: '12px',
                 border: 'none',
-                background: page === 1 
-                  ? 'rgba(255, 255, 255, 0.3)' 
+                background: page === 1
+                  ? 'rgba(255, 255, 255, 0.3)'
                   : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
                 color: page === 1 ? 'rgba(255, 255, 255, 0.6)' : '#fff',
                 fontWeight: 600,
                 fontSize: '0.95rem',
                 cursor: page === 1 ? 'not-allowed' : 'pointer',
-                boxShadow: page === 1 
-                  ? 'none' 
+                boxShadow: page === 1
+                  ? 'none'
                   : '0 4px 15px rgba(247, 51, 23, 0.3)',
                 transition: 'all 0.3s ease',
                 backdropFilter: 'blur(10px)',
@@ -1227,7 +1227,7 @@ export default function ConfirmationTable() {
             >
               ← Anterior
             </button>
-            
+
             <div style={{
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
               padding: '0.75rem 1.5rem',
@@ -1243,7 +1243,7 @@ export default function ConfirmationTable() {
             }}>
               Página {page} de {totalPages}
             </div>
-            
+
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
@@ -1251,15 +1251,15 @@ export default function ConfirmationTable() {
                 padding: '0.75rem 1.5rem',
                 borderRadius: '12px',
                 border: 'none',
-                background: page === totalPages 
-                  ? 'rgba(255, 255, 255, 0.3)' 
+                background: page === totalPages
+                  ? 'rgba(255, 255, 255, 0.3)'
                   : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
                 color: page === totalPages ? 'rgba(255, 255, 255, 0.6)' : '#fff',
                 fontWeight: 600,
                 fontSize: '0.95rem',
                 cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                boxShadow: page === totalPages 
-                  ? 'none' 
+                boxShadow: page === totalPages
+                  ? 'none'
                   : '0 4px 15px rgba(247, 51, 23, 0.3)',
                 transition: 'all 0.3s ease',
                 backdropFilter: 'blur(10px)',
@@ -1350,7 +1350,7 @@ export default function ConfirmationTable() {
                   Asignar ID de Orden de Compra
                 </div>
               </div>
-              
+
               <div style={{ color: '#0369a1', lineHeight: '1.5', marginBottom: '1rem' }}>
                 Está a punto de asignar el ID de orden de compra <strong>"{modalOrdenData.ordenCompra}"</strong> a la solicitud RQ{modalOrdenData.solicitud.id}.
               </div>
@@ -1363,17 +1363,17 @@ export default function ConfirmationTable() {
               }}>
                 <div style={{ marginBottom: '0.5rem' }}>
                   <span style={{ fontWeight: 600, color: '#374151' }}>Solicitud: </span>
-                  <span style={{ 
-                    backgroundColor: '#dbeafe', 
-                    color: '#1e40af', 
-                    padding: '0.25rem 0.5rem', 
+                  <span style={{
+                    backgroundColor: '#dbeafe',
+                    color: '#1e40af',
+                    padding: '0.25rem 0.5rem',
                     borderRadius: '6px',
                     fontWeight: 600
                   }}>
                     RQ{modalOrdenData.solicitud.id}
                   </span>
                 </div>
-                
+
                 <div>
                   <span style={{ fontWeight: 600, color: '#374151' }}>Descripción: </span>
                   <span style={{ color: '#6b7280' }}>
@@ -1413,7 +1413,7 @@ export default function ConfirmationTable() {
               >
                 ❌ Cancelar
               </button>
-              
+
               <button
                 onClick={modalOrdenData.onConfirm}
                 style={{
@@ -1507,7 +1507,7 @@ export default function ConfirmationTable() {
                   Detalles de Solicitud
                 </h3>
               </div>
-              
+
               <button
                 onClick={() => setShowDetailModal(false)}
                 style={{
@@ -1564,7 +1564,7 @@ export default function ConfirmationTable() {
                   }}>
                     📦 Status y Fecha de Orden
                   </h4>
-                  
+
                   {!editingStatusFechaOrden ? (
                     <button
                       onClick={iniciarEdicionStatusFechaOrden}
@@ -1625,7 +1625,7 @@ export default function ConfirmationTable() {
                     </div>
                   )}
                 </div>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -1677,7 +1677,7 @@ export default function ConfirmationTable() {
                       </select>
                     )}
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1700,7 +1700,7 @@ export default function ConfirmationTable() {
                         fontStyle: selectedSolicitud.fechaOrden ? 'normal' : 'italic'
                       }}>
                         {selectedSolicitud.fechaOrden ? (
-                          new Date(selectedSolicitud.fechaOrden).toLocaleDateString('es-PE')
+                          selectedSolicitud.fechaOrden
                         ) : (
                           'No especificada'
                         )}
@@ -1740,9 +1740,9 @@ export default function ConfirmationTable() {
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   color: '#fff',
-                  backgroundColor: 
-                    selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' : 
-                    selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
+                  backgroundColor:
+                    selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' :
+                      selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -1754,9 +1754,9 @@ export default function ConfirmationTable() {
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   color: '#fff',
-                  backgroundColor: 
-                    selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' : 
-                    selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                  backgroundColor:
+                    selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' :
+                      selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -1780,7 +1780,7 @@ export default function ConfirmationTable() {
                 }}>
                   📝 Información Principal
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -1804,7 +1804,7 @@ export default function ConfirmationTable() {
                       {selectedSolicitud.sp}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1824,7 +1824,7 @@ export default function ConfirmationTable() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div style={{ marginTop: '0.75rem' }}>
                   <div style={{
                     fontSize: '0.75rem',
@@ -1871,7 +1871,7 @@ export default function ConfirmationTable() {
                   }}>
                     🏷️ Categorización
                   </h4>
-                  
+
                   {!editingCategorizacion ? (
                     <button
                       onClick={iniciarEdicionCategorizacion}
@@ -1932,7 +1932,7 @@ export default function ConfirmationTable() {
                     </div>
                   )}
                 </div>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -1982,7 +1982,7 @@ export default function ConfirmationTable() {
                       </select>
                     )}
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -2071,7 +2071,7 @@ export default function ConfirmationTable() {
                   }}>
                     🔧 Máquina
                   </h4>
-                  
+
                   {!editingMaquina ? (
                     <button
                       onClick={iniciarEdicionMaquina}
@@ -2205,7 +2205,7 @@ export default function ConfirmationTable() {
                   }}>
                     💰 Información Comercial
                   </h4>
-                  
+
                   {!editingComercial ? (
                     <button
                       onClick={iniciarEdicionComercial}
@@ -2266,7 +2266,7 @@ export default function ConfirmationTable() {
                     </div>
                   )}
                 </div>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr 1fr',
@@ -2320,7 +2320,7 @@ export default function ConfirmationTable() {
                       />
                     )}
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -2371,7 +2371,7 @@ export default function ConfirmationTable() {
                       </select>
                     )}
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -2423,7 +2423,7 @@ export default function ConfirmationTable() {
                     )}
                   </div>
                 </div>
-                
+
                 <div style={{
                   marginTop: '0.75rem',
                   padding: '0.75rem',
@@ -2447,8 +2447,8 @@ export default function ConfirmationTable() {
                       fontWeight: 700,
                       color: '#059669'
                     }}>
-                      {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', { 
-                        minimumFractionDigits: 2 
+                      {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', {
+                        minimumFractionDigits: 2
                       })} {selectedSolicitud.moneda}
                     </div>
                   ) : (
@@ -2500,7 +2500,7 @@ export default function ConfirmationTable() {
                   }}>
                     🛒 Orden de Compra
                   </h4>
-                  
+
                   <div style={{
                     fontSize: '1.2rem',
                     fontWeight: 700,
@@ -2539,7 +2539,7 @@ export default function ConfirmationTable() {
                     }}>
                       📅 Fecha y Comentarios
                     </h4>
-                    
+
                     {!editingFechaComentarios ? (
                       <button
                         onClick={iniciarEdicionFechaComentarios}
@@ -2600,7 +2600,7 @@ export default function ConfirmationTable() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div style={{ marginBottom: '0.75rem' }}>
                     <div style={{
                       fontSize: '0.75rem',
@@ -2622,7 +2622,7 @@ export default function ConfirmationTable() {
                         border: '1px solid #c7d2fe'
                       }}>
                         {selectedSolicitud.fecha ? (
-                          new Date(selectedSolicitud.fecha).toLocaleDateString('es-PE')
+                          selectedSolicitud.fecha
                         ) : (
                           'No especificada'
                         )}

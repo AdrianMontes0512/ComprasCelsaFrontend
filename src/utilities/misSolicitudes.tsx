@@ -52,20 +52,20 @@ export default function MySolicitudes() {
         setLoading(true);
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
-        
+
         console.log('🔍 Cargando solicitudes del usuario:', userId);
-        
+
         // Usar el endpoint del usuario autenticado CON paginación
         const res = await fetch(`http://192.168.0.113:8080/solicitudes/usuario/${userId}?page=${page - 1}&size=${PAGE_SIZE}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        
+
         if (res.ok) {
           const data = await res.json();
           console.log('📦 Solicitudes del usuario recibidas:', data);
-          
+
           // Manejar la estructura de paginación del backend
           if (data.content && Array.isArray(data.content)) {
             setSolicitudes(data.content);
@@ -95,7 +95,7 @@ export default function MySolicitudes() {
         setLoading(false);
       }
     };
-    
+
     fetchSolicitudes();
   }, [page]); // Agregar dependencia de page para recargar cuando cambie la página
 
@@ -119,10 +119,10 @@ export default function MySolicitudes() {
 
   // CAMBIAR: Calcular el total de páginas en base a las solicitudes filtradas
   const totalPagesCalculated = Math.ceil(solicitudesFiltradas.length / PAGE_SIZE);
-  
+
   // Si hay filtros activos, usar paginación local, sino usar la del backend
-  const finalTotalPages = (filtroPrioridad || filtroTipo || filtroEstado || filtroId) 
-    ? totalPagesCalculated 
+  const finalTotalPages = (filtroPrioridad || filtroTipo || filtroEstado || filtroId)
+    ? totalPagesCalculated
     : totalPages;
 
   // Función para exportar a Excel
@@ -137,7 +137,7 @@ export default function MySolicitudes() {
       Subfamilia: s.subFamilia,
       Cantidad: s.cantidad,
       Precio: s.precio,
-      'Fecha Solicitud': s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha',
+      'Fecha Solicitud': s.fecha || 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
       'Orden de Compra': s.ordenCompra || 'Sin asignar',
@@ -183,39 +183,39 @@ export default function MySolicitudes() {
     const token = localStorage.getItem('token');
     try {
       console.log('📥 Iniciando descarga de PDF para solicitud:', id);
-      
+
       const res = await fetch(`http://192.168.0.113:8080/solicitudes/imagen/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (!res.ok) {
         console.error('❌ Error en la respuesta del servidor:', res.status);
         alert('No se pudo descargar el archivo PDF');
         return;
       }
-      
+
       const blob = await res.blob();
       console.log('📦 Blob recibido, tipo:', blob.type, 'tamaño:', blob.size);
-      
+
       // Crear URL para el blob
       const url = window.URL.createObjectURL(blob);
-      
+
       // Crear elemento de descarga
       const a = document.createElement('a');
       a.href = url;
       a.download = `solicitud_RQ${id}.pdf`; // Forzar extensión .pdf
       a.style.display = 'none';
-      
+
       // Agregar al DOM, hacer clic y remover
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      
+
       // Limpiar URL del blob
       window.URL.revokeObjectURL(url);
-      
+
       console.log('✅ Descarga PDF completada para solicitud:', id);
-      
+
     } catch (error) {
       console.error('❌ Error al descargar PDF:', error);
       alert('Error al descargar el archivo PDF');
@@ -229,14 +229,14 @@ export default function MySolicitudes() {
   };
 
   return (
-    <div style={{ 
+    <div style={{
       position: 'absolute',
       left: 0,
       right: 0,
       top: 0,
       bottom: 0,
-      padding: '1rem', 
-      width: '100vw', 
+      padding: '1rem',
+      width: '100vw',
       minWidth: '100vw',
       overflowX: 'auto',
       overflowY: 'auto',
@@ -277,8 +277,8 @@ export default function MySolicitudes() {
             backdropFilter: 'blur(10px)'
           }}>
             {/* CAMBIAR: Mostrar el total correcto usando totalElements */}
-            Total: {(filtroPrioridad || filtroTipo || filtroEstado || filtroId) 
-              ? `${solicitudesFiltradas.length} (filtradas de ${totalElements})` 
+            Total: {(filtroPrioridad || filtroTipo || filtroEstado || filtroId)
+              ? `${solicitudesFiltradas.length} (filtradas de ${totalElements})`
               : `${totalElements}`} solicitudes
           </div>
         </div>
@@ -313,18 +313,18 @@ export default function MySolicitudes() {
       </div>
 
       {/* Filtros - sin filtro de usuario ya que solo ve sus propias solicitudes */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '1rem', 
-        marginBottom: '2rem', 
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        marginBottom: '2rem',
         justifyContent: 'center',
-        flexWrap: 'wrap' 
+        flexWrap: 'wrap'
       }}>
         <select
           value={filtroPrioridad}
           onChange={e => setFiltroPrioridad(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -342,8 +342,8 @@ export default function MySolicitudes() {
         <select
           value={filtroTipo}
           onChange={e => setFiltroTipo(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -361,8 +361,8 @@ export default function MySolicitudes() {
         <select
           value={filtroEstado}
           onChange={e => setFiltroEstado(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -382,8 +382,8 @@ export default function MySolicitudes() {
           placeholder="🆔 Buscar por ID"
           value={filtroId}
           onChange={e => setFiltroId(e.target.value)}
-          style={{ 
-            padding: '0.6rem 1rem', 
+          style={{
+            padding: '0.6rem 1rem',
             borderRadius: '10px',
             border: '2px solid #e5e7eb',
             fontSize: '0.9rem',
@@ -440,20 +440,20 @@ export default function MySolicitudes() {
             </thead>
             <tbody>
               {solicitudesPaginadas.map((s, index) => (
-                <tr key={s.id} style={{ 
-                  textAlign: 'center', 
+                <tr key={s.id} style={{
+                  textAlign: 'center',
                   borderBottom: '1px solid #f1f5f9',
                   backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseOver={e => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.transform = 'scale(1.01)';
-                }}
-                onMouseOut={e => {
-                  e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                    e.currentTarget.style.transform = 'scale(1.01)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
                   <td style={tdStyle}>
                     <button
@@ -490,9 +490,9 @@ export default function MySolicitudes() {
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       color: '#fff',
-                      backgroundColor: 
-                        s.prioridad === 'Emergencia' ? '#dc2626' : 
-                        s.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                      backgroundColor:
+                        s.prioridad === 'Emergencia' ? '#dc2626' :
+                          s.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
                       textTransform: 'uppercase' as const,
                       letterSpacing: '0.3px',
                       whiteSpace: 'nowrap' as const,
@@ -552,7 +552,7 @@ export default function MySolicitudes() {
                       color: '#6b7280',
                       fontSize: '0.85rem'
                     }}>
-                      {s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha'}
+                      {s.fecha || 'Sin fecha'}
                     </span>
                   </td>
                   <td style={tdStyle}>{s.moneda}</td>
@@ -563,9 +563,9 @@ export default function MySolicitudes() {
                       fontSize: '0.85rem',
                       fontWeight: 600,
                       color: '#fff',
-                      backgroundColor: 
-                        s.estado === 'Pendiente' ? '#f59e0b' : 
-                        s.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
+                      backgroundColor:
+                        s.estado === 'Pendiente' ? '#f59e0b' :
+                          s.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
                       textTransform: 'uppercase' as const,
                       letterSpacing: '0.5px'
                     }}>
@@ -633,12 +633,12 @@ export default function MySolicitudes() {
               ))}
             </tbody>
           </table>
-          
+
           {/* Paginación */}
-          <div style={{ 
-            marginTop: '2rem', 
-            display: 'flex', 
-            justifyContent: 'center', 
+          <div style={{
+            marginTop: '2rem',
+            display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
             gap: '1rem',
             flexWrap: 'wrap'
@@ -658,15 +658,15 @@ export default function MySolicitudes() {
                 padding: '0.75rem 1.5rem',
                 borderRadius: '12px',
                 border: 'none',
-                background: page === 1 
-                  ? 'rgba(255, 255, 255, 0.3)' 
+                background: page === 1
+                  ? 'rgba(255, 255, 255, 0.3)'
                   : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
                 color: page === 1 ? 'rgba(255, 255, 255, 0.6)' : '#fff',
                 fontWeight: 600,
                 fontSize: '0.95rem',
                 cursor: page === 1 ? 'not-allowed' : 'pointer',
-                boxShadow: page === 1 
-                  ? 'none' 
+                boxShadow: page === 1
+                  ? 'none'
                   : '0 4px 15px rgba(247, 51, 23, 0.3)',
                 transition: 'all 0.3s ease',
                 backdropFilter: 'blur(10px)',
@@ -677,7 +677,7 @@ export default function MySolicitudes() {
             >
               ← Anterior
             </button>
-            
+
             <div style={{
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
               padding: '0.75rem 1.5rem',
@@ -694,7 +694,7 @@ export default function MySolicitudes() {
               {/* CAMBIAR: Mostrar la paginación correcta */}
               Página {page} de {finalTotalPages || 1}
             </div>
-            
+
             <button
               onClick={() => {
                 if (filtroPrioridad || filtroTipo || filtroEstado || filtroId) {
@@ -710,15 +710,15 @@ export default function MySolicitudes() {
                 padding: '0.75rem 1.5rem',
                 borderRadius: '12px',
                 border: 'none',
-                background: page === finalTotalPages 
-                  ? 'rgba(255, 255, 255, 0.3)' 
+                background: page === finalTotalPages
+                  ? 'rgba(255, 255, 255, 0.3)'
                   : 'linear-gradient(135deg, #f73317 0%, #e02b0f 100%)',
                 color: page === finalTotalPages ? 'rgba(255, 255, 255, 0.6)' : '#fff',
                 fontWeight: 600,
                 fontSize: '0.95rem',
                 cursor: page === finalTotalPages ? 'not-allowed' : 'pointer',
-                boxShadow: page === finalTotalPages 
-                  ? 'none' 
+                boxShadow: page === finalTotalPages
+                  ? 'none'
                   : '0 4px 15px rgba(247, 51, 23, 0.3)',
                 transition: 'all 0.3s ease',
                 backdropFilter: 'blur(10px)',
@@ -796,7 +796,7 @@ export default function MySolicitudes() {
                   Detalles de Mi Solicitud
                 </h3>
               </div>
-              
+
               <button
                 onClick={() => setShowDetailModal(false)}
                 style={{
@@ -847,7 +847,7 @@ export default function MySolicitudes() {
                 }}>
                   📦 Status y Fecha de Orden
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -876,7 +876,7 @@ export default function MySolicitudes() {
                       {selectedSolicitud.status ? selectedSolicitud.status.replace('_', ' ') : 'No especificado'}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -898,7 +898,7 @@ export default function MySolicitudes() {
                       fontStyle: selectedSolicitud.fechaOrden ? 'normal' : 'italic'
                     }}>
                       {selectedSolicitud.fechaOrden ? (
-                        new Date(selectedSolicitud.fechaOrden).toLocaleDateString('es-PE')
+                        selectedSolicitud.fechaOrden
                       ) : (
                         'No especificada'
                       )}
@@ -920,9 +920,9 @@ export default function MySolicitudes() {
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   color: '#fff',
-                  backgroundColor: 
-                    selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' : 
-                    selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
+                  backgroundColor:
+                    selectedSolicitud.estado === 'Pendiente' ? '#f59e0b' :
+                      selectedSolicitud.estado === 'Aprobado' ? '#22c55e' : '#dc2626',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -934,9 +934,9 @@ export default function MySolicitudes() {
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   color: '#fff',
-                  backgroundColor: 
-                    selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' : 
-                    selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
+                  backgroundColor:
+                    selectedSolicitud.prioridad === 'Emergencia' ? '#dc2626' :
+                      selectedSolicitud.prioridad === 'Urgencia' ? '#f59e0b' : '#22c55e',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -960,7 +960,7 @@ export default function MySolicitudes() {
                 }}>
                   📝 Información Principal
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -984,7 +984,7 @@ export default function MySolicitudes() {
                       {selectedSolicitud.sp}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1004,7 +1004,7 @@ export default function MySolicitudes() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div style={{ marginTop: '0.75rem' }}>
                   <div style={{
                     fontSize: '0.75rem',
@@ -1045,7 +1045,7 @@ export default function MySolicitudes() {
                 }}>
                   🏷️ Categorización
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -1069,7 +1069,7 @@ export default function MySolicitudes() {
                       {selectedSolicitud.familia || 'No especificado'}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1155,7 +1155,7 @@ export default function MySolicitudes() {
                 }}>
                   💰 Información Comercial
                 </h4>
-                
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr 1fr',
@@ -1179,7 +1179,7 @@ export default function MySolicitudes() {
                       {selectedSolicitud.cantidad}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1198,7 +1198,7 @@ export default function MySolicitudes() {
                       {selectedSolicitud.umedida}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div style={{
                       fontSize: '0.75rem',
@@ -1218,7 +1218,7 @@ export default function MySolicitudes() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div style={{
                   marginTop: '0.75rem',
                   padding: '0.75rem',
@@ -1241,8 +1241,8 @@ export default function MySolicitudes() {
                     fontWeight: 700,
                     color: '#059669'
                   }}>
-                    {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', { 
-                      minimumFractionDigits: 2 
+                    {parseFloat(selectedSolicitud.precio).toLocaleString('es-PE', {
+                      minimumFractionDigits: 2
                     })} {selectedSolicitud.moneda}
                   </div>
                 </div>
@@ -1265,7 +1265,7 @@ export default function MySolicitudes() {
                   }}>
                     🛒 Orden de Compra
                   </h4>
-                  
+
                   <div style={{
                     fontSize: '1.2rem',
                     fontWeight: 700,
@@ -1297,7 +1297,7 @@ export default function MySolicitudes() {
                   }}>
                     📅 Información Adicional
                   </h4>
-                  
+
                   {selectedSolicitud.fecha && (
                     <div style={{ marginBottom: '0.75rem' }}>
                       <div style={{
@@ -1318,7 +1318,7 @@ export default function MySolicitudes() {
                         borderRadius: '6px',
                         border: '1px solid #c7d2fe'
                       }}>
-                        {new Date(selectedSolicitud.fecha).toLocaleDateString('es-PE')}
+                        {selectedSolicitud.fecha}
                       </div>
                     </div>
                   )}
