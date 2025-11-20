@@ -808,7 +808,7 @@ export default function ConfirmationTable() {
                 <th style={thStyle}>🔢 Cantidad</th>
                 <th style={thStyle}>💰 Importe Referencial</th>
                 <th style={thStyle}>📅 Fecha Solicitud</th>
-                <th style={thStyle}>Moneda</th>
+                <th style={thStyle}>📋 Status</th>
                 <th style={thStyle}>📊 Estado</th>
                 <th style={thStyle}>Orden de Compra</th>
                 <th style={thStyle}>👤 Usuario</th>
@@ -932,7 +932,22 @@ export default function ConfirmationTable() {
                       {s.fecha || 'Sin fecha'}
                     </span>
                   </td>
-                  <td style={tdStyle}>{s.moneda}</td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '20px',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: '#fff',
+                      backgroundColor:
+                        s.estado === 'Pendiente' ? '#f59e0b' :
+                          s.estado === 'Aprobado' ? '#3b82f6' : '#6b7280',
+                      textTransform: 'capitalize' as const,
+                      letterSpacing: '0.5px'
+                    }}>
+                      {s.estado === 'Pendiente' ? 'Pendiente' : (s.status || 'Sin status')}
+                    </span>
+                  </td>
                   <td style={tdStyle}>
                     <span style={{
                       padding: '0.4rem 0.8rem',
