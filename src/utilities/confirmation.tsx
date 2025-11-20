@@ -153,7 +153,7 @@ export default function ConfirmationTable() {
       Subfamilia: s.subFamilia,
       Cantidad: s.cantidad,
       Precio: s.precio,
-      'Fecha Solicitud': s.fecha ? new Date(s.fecha).toLocaleDateString('es-PE') : 'Sin fecha',
+      'Fecha Solicitud': s.fecha || 'Sin fecha',
       Moneda: s.moneda,
       Estado: s.estado,
       'Orden de Compra': s.ordenCompra || 'Sin asignar',

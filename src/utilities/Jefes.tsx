@@ -527,10 +527,8 @@ export default function JefesTable() {
                       onChange={(e) => {
                         const nuevoEstado = e.target.value;
                         
-                        // Si es el mismo estado, no hacer nada
                         if (nuevoEstado === s.estado) return;
                         
-                        // Mostrar modal de confirmación personalizado
                         setModalData({
                           solicitud: s,
                           nuevoEstado,
@@ -564,7 +562,6 @@ export default function JefesTable() {
                             setModalData(null);
                           },
                           onCancel: () => {
-                            // Revertir el select al estado original
                             (e.target as HTMLSelectElement).value = s.estado;
                             setShowModal(false);
                             setModalData(null);
@@ -651,7 +648,6 @@ export default function JefesTable() {
             </tbody>
           </table>
           
-          {/* Paginación */}
           <div style={{ 
             marginTop: '2rem', 
             display: 'flex', 
@@ -710,7 +706,6 @@ export default function JefesTable() {
         </>
       )}
 
-      {/* Modal de Confirmación Personalizado */}
       {showModal && modalData && (
         <div style={{
           position: 'fixed',
@@ -877,11 +872,11 @@ export default function JefesTable() {
                 }}
                 onMouseOver={e => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow: '0 6px 20px rgba(247, 51, 23, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 51, 23, 0.4)';
                 }}
                 onMouseOut={e => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow: '0 4px 15px rgba(247, 51, 23, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(247, 51, 23, 0.3)';
                 }}
               >
                 ✅ Confirmar Cambio
@@ -891,7 +886,6 @@ export default function JefesTable() {
         </div>
       )}
 
-      {/* Modal de Detalles de Solicitud */}
       {showDetailModal && selectedSolicitud && (
         <div style={{
           position: 'fixed',
