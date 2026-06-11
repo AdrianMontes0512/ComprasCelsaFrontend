@@ -1,69 +1,188 @@
-@import "tailwindcss";
+/* ============================================================
+   COMPRAS CELSA — Design system tokens
+   Derived from Manual de Marca CELSA
+   ============================================================ */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* — Brand primary (rojo Celsa, del manual: PANTONE P52-8 U, RGB 229/32/29) */
+  --celsa-red-50:  #fdecec;
+  --celsa-red-100: #fbd5d4;
+  --celsa-red-200: #f6a8a6;
+  --celsa-red-300: #ef7672;
+  --celsa-red-400: #ec4a46;
+  --celsa-red-500: #e5201d;
+  --celsa-red-600: #c91a18;
+  --celsa-red-700: #a01513;
+  --celsa-red-800: #7a100f;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* — Brand secondaries (manual de marca) */
+  --celsa-azul:   #315ca8;
+  --celsa-verde:  #3fad58;
+  --celsa-plomo-acerado: #2d2f40;
+  --celsa-plomo:  #a6a6a6;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* — Neutrals (warm gray scale tuned to plomo) */
+  --ink-0:  #ffffff;
+  --ink-25: #fafafb;
+  --ink-50: #f5f5f7;
+  --ink-100: #ececef;
+  --ink-150: #e0e0e5;
+  --ink-200: #d3d3da;
+  --ink-300: #b8b8c2;
+  --ink-400: #8e8e9c;
+  --ink-500: #6a6a78;
+  --ink-600: #4d4d59;
+  --ink-700: #36363f;
+  --ink-800: #25252e;
+  --ink-900: #18181f;
+  --ink-950: #0e0e14;
+
+  /* — Status */
+  --status-pendiente-bg:   #fef3c7;
+  --status-pendiente-bd:   #f3d785;
+  --status-pendiente-fg:   #92400e;
+  --status-aprobado-bg:    #dcfce7;
+  --status-aprobado-bd:    #95e3a8;
+  --status-aprobado-fg:    #166534;
+  --status-rechazado-bg:   #fee2e2;
+  --status-rechazado-bd:   #f5b1ad;
+  --status-rechazado-fg:   #991b1b;
+
+  /* — Prioridades */
+  --prio-emergencia:  var(--celsa-red-500);
+  --prio-urgencia:    #f59e0b;
+  --prio-estandar:    var(--celsa-verde);
+
+  /* — Surfaces */
+  --bg-app:        var(--ink-25);
+  --bg-surface:    var(--ink-0);
+  --bg-sunken:     var(--ink-50);
+  --bg-sidebar:    var(--celsa-plomo-acerado);
+  --bg-sidebar-hi: #3a3c50;
+  --border:        var(--ink-150);
+  --border-strong: var(--ink-200);
+
+  /* — Text */
+  --fg:            var(--ink-900);
+  --fg-muted:      var(--ink-500);
+  --fg-subtle:     var(--ink-400);
+  --fg-on-red:     #ffffff;
+  --fg-on-dark:    #f0f0f4;
+
+  /* — Type */
+  --font-sans: "Montserrat", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* — Radius */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-pill: 999px;
+
+  /* — Shadow */
+  --sh-sm:   0 1px 2px rgba(24,24,31,0.06), 0 1px 1px rgba(24,24,31,0.04);
+  --sh-md:   0 4px 12px rgba(24,24,31,0.08), 0 1px 3px rgba(24,24,31,0.05);
+  --sh-lg:   0 10px 30px rgba(24,24,31,0.10), 0 4px 10px rgba(24,24,31,0.06);
+  --sh-xl:   0 24px 48px rgba(24,24,31,0.14), 0 8px 16px rgba(24,24,31,0.08);
+  --sh-red:  0 8px 20px rgba(229,32,29,0.28);
+  --sh-focus: 0 0 0 3px rgba(229,32,29,0.18);
+
+  /* — Motion */
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.7, 0, 0.3, 1);
+
+  /* — Layout */
+  --sidebar-w: 248px;
+  --header-h:  64px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+[data-theme="dark"] {
+  --bg-app:        #0f1019;
+  --bg-surface:    #1a1b27;
+  --bg-sunken:     #13141d;
+  --bg-sidebar:    #0b0c14;
+  --bg-sidebar-hi: #1b1d2c;
+  --border:        #262838;
+  --border-strong: #353749;
+  --fg:            #ecedf3;
+  --fg-muted:      #9a9cae;
+  --fg-subtle:     #6f7186;
+  --status-pendiente-bg: #3b2f10;
+  --status-pendiente-bd: #66501c;
+  --status-pendiente-fg: #fbd779;
+  --status-aprobado-bg:  #0e2e1c;
+  --status-aprobado-bd:  #1b5836;
+  --status-aprobado-fg:  #7be0a3;
+  --status-rechazado-bg: #361414;
+  --status-rechazado-bd: #71261f;
+  --status-rechazado-fg: #f8a8a3;
+  --sh-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --sh-md: 0 4px 12px rgba(0,0,0,0.45);
+  --sh-lg: 0 10px 30px rgba(0,0,0,0.55);
 }
 
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; }
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01" 1, "cv11" 1;
+  color: var(--fg);
+  background: var(--bg-app);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button { font: inherit; color: inherit; }
+input, select, textarea { font: inherit; color: inherit; }
+
+/* The "orla" — angular accent extracted from CELSA logo */
+.orla {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  position: relative;
+  flex: 0 0 auto;
+}
+.orla::before, .orla::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--celsa-red-500);
+}
+.orla::before { clip-path: polygon(0 0, 60% 0, 0 60%); }
+.orla::after  { clip-path: polygon(100% 100%, 100% 40%, 40% 100%); }
+.orla--white::before,
+.orla--white::after { border-color: #fff; }
+
+@keyframes spin-360   { to { transform: rotate(360deg); } }
+@keyframes fade-in    { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes modal-pop  { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes toast-in   { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+@keyframes shimmer    { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+
+.fade-in  { animation: fade-in 0.25s var(--ease-out) both; }
+.slide-up { animation: slide-up 0.35s var(--ease-out) both; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--ink-100) 0%, var(--ink-50) 50%, var(--ink-100) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: var(--r-sm);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: var(--ink-300); background-clip: padding-box; border: 2px solid transparent; }
+*::-webkit-scrollbar-track { background: transparent; }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+:focus-visible {
+  outline: 2px solid var(--celsa-red-500);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
 }
